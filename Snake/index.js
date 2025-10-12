@@ -16,13 +16,13 @@ createboard()
 
 /*snake*/
 var snake = document.getElementById('snake');
-let snakeSpeed = 10
+let snakeSpeed = 100
 let movement = 'bottom'
 let nextmovement = '';
 
 
 function placeSnake() {
-  let positionSnake = board.children[55].getBoundingClientRect();
+  let positionSnake = board.children[0].getBoundingClientRect();
   snake.style.left = positionSnake.left + 3 + 'px';
   snake.style.top = positionSnake.top + 3 + 'px';
 }
@@ -39,10 +39,13 @@ function checkCell() {
   }
   return null
 }
+  console.log(board.getBoundingClientRect())
+  console.log(window.getComputedStyle(snake).getPropertyValue('top'))
 
 function moveSnake() {
   let currentLeft = parseInt(snake.style.left) || 0;
   let currentTop = parseInt(snake.style.top) || 0;
+  console.log(snake.getBoundingClientRect().top)
   if (checkCell() !== null) {
     nextmovement = movement;
   }
@@ -63,27 +66,42 @@ function moveSnake() {
 
 }
 
+function gamelose() {
+  const gameloseText = document.createElement('div');
+  gameloseText.textContent = 'game lose';
+  const body = document.querySelector('body');
+  body.appendChild(gameloseText)
+}
+
 document.addEventListener('keydown', e => {
   switch (e.key) {
     case 'ArrowUp':
-      movement = 'top'
+      if (movement != 'bottom') {
+        movement = 'top'
+      }
       break;
     case 'ArrowDown':
-      movement = 'bottom'
+      if (movement != 'top') {
+        movement = 'bottom'
+      }
       break;
     case 'ArrowLeft':
-      movement = 'left'
+      if (movement != 'right') {
+        movement = 'left'
+      }
       break;
     case 'ArrowRight':
-      movement = 'right'
+      if (movement != 'left') {
+        movement = 'right'
+      }
       break;
   }
 })
 
-placeSnake()
-setInterval(moveSnake, snakeSpeed)
 
-/*сделать сетку по которым катается змейка*/
-/*добавить ограничения, по краям и по направлению */
+placeSnake()
+/*setInterval(moveSnake, snakeSpeed)
+
+/*добавить ограничения, по краям */
 /*добавить яблочки*/
 /*добавить сложности и конец игры*/
