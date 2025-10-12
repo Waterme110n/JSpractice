@@ -16,13 +16,14 @@ createboard()
 
 /*snake*/
 var snake = document.getElementById('snake');
-let snakeSpeed = 100
-let movement = 'bottom'
+let snakeSpeed = 10
+let movement = 'right'
 let nextmovement = '';
 
 
+
 function placeSnake() {
-  let positionSnake = board.children[0].getBoundingClientRect();
+  let positionSnake = board.children[55].getBoundingClientRect();
   snake.style.left = positionSnake.left + 3 + 'px';
   snake.style.top = positionSnake.top + 3 + 'px';
 }
@@ -33,19 +34,15 @@ function checkCell() {
     const snakeRect = snake.getBoundingClientRect();
     if (snakeRect.left >= (cellRect.left + 3) && snakeRect.right < (cellRect.right - 3) &&
       snakeRect.top >= (cellRect.top + 3) && snakeRect.bottom < (cellRect.bottom - 3)) {
-      console.log(i);
       return i;
     }
   }
   return null
 }
-  console.log(board.getBoundingClientRect())
-  console.log(window.getComputedStyle(snake).getPropertyValue('top'))
 
 function moveSnake() {
   let currentLeft = parseInt(snake.style.left) || 0;
   let currentTop = parseInt(snake.style.top) || 0;
-  console.log(snake.getBoundingClientRect().top)
   if (checkCell() !== null) {
     nextmovement = movement;
   }
@@ -63,15 +60,29 @@ function moveSnake() {
       snake.style.top = (currentTop + 1) + 'px';
       break;
   }
+  if (gameover() === 1){
+    clearInterval(gameInterval);
+  }
 
 }
 
-function gamelose() {
+function gameover() {
+  const boardPosition = board.getBoundingClientRect()
+  const snakePosition = snake.getBoundingClientRect()
+  if (snakePosition.left < boardPosition.left ||
+    snakePosition.top < boardPosition.top ||
+    snakePosition.right > boardPosition.right ||
+    snakePosition.bottom > boardPosition.bottom
+  ) {
   const gameloseText = document.createElement('div');
-  gameloseText.textContent = 'game lose';
+  gameloseText.textContent = 'game over';
+  gameloseText.classList.add('gameover');
   const body = document.querySelector('body');
   body.appendChild(gameloseText)
+    return 1;
+  }
 }
+
 
 document.addEventListener('keydown', e => {
   switch (e.key) {
@@ -100,8 +111,7 @@ document.addEventListener('keydown', e => {
 
 
 placeSnake()
-/*setInterval(moveSnake, snakeSpeed)
+let gameInterval = setInterval(moveSnake, snakeSpeed)
 
-/*добавить ограничения, по краям */
-/*добавить яблочки*/
-/*добавить сложности и конец игры*/
+/*добавить яблочки и доп рост за них*/
+/*добавить сложности*/
