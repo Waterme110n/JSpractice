@@ -1,8 +1,9 @@
 /*square*/
 const board = document.getElementById('square');
+const body = document.querySelector('body');
 var boardSize = 10
 
-function createboard() {
+function createBoard() {
   board.innerHTML = '';
   for (let y = 0; y < boardSize; y++) {
     for (let x = 0; x < boardSize; x++) {
@@ -12,20 +13,20 @@ function createboard() {
     }
   }
 }
-createboard()
 
 /*snake*/
 var snake = document.getElementById('snake');
 let snakeSpeed = 10
 let movement = 'right'
 let nextmovement = '';
-
-
+let snakeCountBody = [{ left: 0, top: 0 }]
+let frameCount = 0;
 
 function placeSnake() {
   let positionSnake = board.children[55].getBoundingClientRect();
   snake.style.left = positionSnake.left + 3 + 'px';
   snake.style.top = positionSnake.top + 3 + 'px';
+  snakeCountBody.push({ left: positionSnake.left + 3, top: positionSnake.top + 3 })
 }
 
 function checkCell() {
@@ -41,11 +42,21 @@ function checkCell() {
 }
 
 function moveSnake() {
+  frameCount++;
   let currentLeft = parseInt(snake.style.left) || 0;
   let currentTop = parseInt(snake.style.top) || 0;
+
   if (checkCell() !== null) {
     nextmovement = movement;
   }
+
+  snakeCountBody.unshift({ left: currentLeft, top: currentTop });
+
+  const maxLength = document.querySelectorAll('.snakeFrag').length + 1;
+  if (snakeCountBody.length > maxLength * 30) {
+    snakeCountBody.pop();
+  }
+
   switch (nextmovement) {
     case 'left':
       snake.style.left = (currentLeft - 1) + 'px';
@@ -60,10 +71,12 @@ function moveSnake() {
       snake.style.top = (currentTop + 1) + 'px';
       break;
   }
-  if (gameover() === 1){
+
+  if (gameover() === 1) {
     clearInterval(gameInterval);
   }
 
+  moveSnakeFragment()
 }
 
 function gameover() {
@@ -74,15 +87,13 @@ function gameover() {
     snakePosition.right > boardPosition.right ||
     snakePosition.bottom > boardPosition.bottom
   ) {
-  const gameloseText = document.createElement('div');
-  gameloseText.textContent = 'game over';
-  gameloseText.classList.add('gameover');
-  const body = document.querySelector('body');
-  body.appendChild(gameloseText)
+    const gameloseText = document.createElement('div');
+    gameloseText.textContent = 'game over';
+    gameloseText.classList.add('gameover');
+    body.appendChild(gameloseText)
     return 1;
   }
 }
-
 
 document.addEventListener('keydown', e => {
   switch (e.key) {
@@ -109,9 +120,38 @@ document.addEventListener('keydown', e => {
   }
 })
 
-
+createBoard()
 placeSnake()
 let gameInterval = setInterval(moveSnake, snakeSpeed)
+setInterval(addSnakeBody, 5000)
 
-/*добавить яблочки и доп рост за них*/
+/*добавить яблочки и дп рост за них*/
 /*добавить сложности*/
+
+/*яблочки*/
+//добавляешь дополнительного змея который будет повторять с задержкой 0.5 секунды каждый раз твое движение
+
+function addSnakeBody() {
+  const snakePosition = snake.getBoundingClientRect();
+  snakeCountBody.push({ left: snakePosition.left, top: snakePosition.top })
+
+  const snakeFragment = document.createElement('div');
+  snakeFragment.classList.add('snakeFrag');
+
+  snakeFragment.style.left = snakePosition.left + 'px';
+  snakeFragment.style.top = snakePosition.top + 'px';
+  body.appendChild(snakeFragment);
+
+  console.log(snakeCountBody);
+}
+
+function moveSnakeFragment() {
+  const fragments = document.querySelectorAll('.snakeFrag');
+  for (let i = 0; i < fragments.length; i++) {
+    const index = (i + 1) * 30;
+    if (snakeCountBody[index]) {
+      fragments[i].style.left = snakeCountBody[index].left + 'px';
+      fragments[i].style.top = snakeCountBody[index].top + 'px';
+    }
+  }
+}
