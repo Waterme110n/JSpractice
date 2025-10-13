@@ -57,9 +57,7 @@
       background-color: #0e3150;
     }
 
-    .gameover{
-      position: absolute;
-      top: 10vh;
+    .status{
       font-size: 20px;
       font-weight: bold;
     }
@@ -72,10 +70,45 @@
       width: 35px;
       background-color: #810000;
     }
+
+    .menu{
+      position: absolute;
+      background-color: #62d3be;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      top: 5vh;
+      width: 30vw;
+      height: 20vh;
+      border: 1px solid #649dad;
+    }
+    select{
+      width: 50%;
+    }
+    .startgame{
+      padding: 10px 30px;
+      width: auto;
+      height: auto;
+      margin: 20px;
+      border-radius: 3px;
+      border: 1px solid #649dad;
+      background-color: #2b685d;
+    }
   </style>
 </head>
 
 <body>
+  <div class="menu">
+    <p class="status">Pause</p>
+    <select id="dificulty">
+      <option value="easy">easy</option>
+      <option value="medium">medium</option>
+      <option value="hard">hard</option>
+      <option value="imposible">imposible</option>
+    </select>
+    <button class="startgame">Start</button>
+  </div>
   <div class="square" id="square"></div>
   <div class="snake" id="snake"></div>
   <script src="index.js"></script>

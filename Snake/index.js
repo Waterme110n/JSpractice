@@ -16,12 +16,13 @@ function createBoard() {
 
 /*snake*/
 var snake = document.getElementById('snake');
-let snakeSpeed = 10
+let snakeSpeed = 0
 let movement = 'right'
 let nextmovement = '';
 let snakeCountBody = [{ left: 0, top: 0 }]
 let frameCount = 0;
-let applePos = []
+let applePos = [];
+let gameInterval;
 
 function placeSnake() {
   let positionSnake = board.children[55].getBoundingClientRect();
@@ -135,10 +136,8 @@ function gameOver() {
 }
 
 function endGame() {
-  const gameloseText = document.createElement('div');
-  gameloseText.textContent = 'game over';
-  gameloseText.classList.add('gameover');
-  body.appendChild(gameloseText)
+  const gameloseText = document.querySelector('.status');
+  gameloseText.textContent = 'Game over';
 }
 
 document.addEventListener('keydown', e => {
@@ -174,7 +173,6 @@ function createApple() {
   let appleCell = Math.floor(Math.random() * 99);
 
   if (applePos.some(item => appleCell == item.index)) {
-    console.log('not');
     createApple();
     return;
   }
@@ -183,11 +181,9 @@ function createApple() {
   apple.style.left = posAppleCell.left + 3 + 'px';
   apple.style.top = posAppleCell.top + 3 + 'px';
 
-  if (snakeCountBody.some(item => 
+  if (snakeCountBody.some(item =>
     Math.round(item.left) === Math.round(posAppleCell.left + 3) &&
-    Math.round(item.top) === Math.round(posAppleCell.top + 3))) 
-    {
-    console.log('in snake');
+    Math.round(item.top) === Math.round(posAppleCell.top + 3))) {
     createApple();
     return;
   }
@@ -218,11 +214,63 @@ function appleTouch() {
   }
 }
 
+function chooseDif() {
+  const dificulty = document.getElementById('dificulty');
+  const selectedValue = dificulty.value;
+  switch (selectedValue) {
+    case 'easy': {
+      snakeSpeed = 20
+      break;
+    }
+    case 'medium': {
+      snakeSpeed = 10
+      break;
+    }
+    case 'hard': {
+      snakeSpeed = 5
+      break;
+    }
+    case 'imposible': {
+      snakeSpeed = 1
+      break;
+    }
+  }
+}
 
 createBoard()
-placeSnake()
-createApple()
-let gameInterval = setInterval(moveSnake, snakeSpeed)
+
+function clearBoard(){
+  const snakeFragment = document.querySelectorAll('.snakeFrag');
+  snakeFragment.forEach(el =>{el.remove();})
+  const apples = document.querySelectorAll('.apple');
+  apples.forEach(el =>{el.remove();})
+  snakeCountBody.length = 0;
+  applePos.length = 0
+  clearInterval(gameInterval);
+}
+
+function startGame(){
+  document.querySelector('.status').textContent = 'Playing';
+  clearBoard();
+  chooseDif();
+  placeSnake();
+  createApple();
+  gameInterval = setInterval(moveSnake, snakeSpeed)
+}
 
 
-/*добавить сложности*/
+
+
+const startButton = document.querySelector('.startgame');
+startButton.addEventListener('click', e => {
+
+  startGame();
+})
+
+/*добавить очки*/
+/*добавить паузу*/
+
+
+
+
+
