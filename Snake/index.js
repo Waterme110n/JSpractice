@@ -1,4 +1,3 @@
-/*square*/
 const board = document.getElementById('square');
 const body = document.querySelector('body');
 var boardSize = 10
@@ -14,10 +13,9 @@ function createBoard() {
   }
 }
 
-/*snake*/
 var snake = document.getElementById('snake');
 let snakeSpeed = 0
-let movement = 'right'
+let movement = ''
 let nextmovement = '';
 let snakeCountBody = [{ left: 0, top: 0 }]
 let frameCount = 0;
@@ -25,7 +23,7 @@ let applePos = [];
 let gameInterval;
 
 function placeSnake() {
-  let positionSnake = board.children[55].getBoundingClientRect();
+  let positionSnake = board.children[Math.floor(Math.random()*99)].getBoundingClientRect();
   snake.style.left = positionSnake.left + 3 + 'px';
   snake.style.top = positionSnake.top + 3 + 'px';
   snakeCountBody.push({ left: positionSnake.left + 3, top: positionSnake.top + 3 })
@@ -139,7 +137,9 @@ function endGame() {
   const gameloseText = document.querySelector('.status');
   gameloseText.textContent = 'Game over';
   startButton.textContent = 'Start';
-  document.getElementById('dificulty').disabled = false;  
+  document.getElementById('dificulty').disabled = false;
+  movement = ''
+  result();
 }
 
 document.addEventListener('keydown', e => {
@@ -195,7 +195,6 @@ function createApple() {
 
 function appleTouch() {
   const snakePosition = snake.getBoundingClientRect();
-  const apples = document.querySelectorAll('.apple');
 
   for (let i = 0; i < applePos.length; i++) {
     const { index, element } = applePos[i]
@@ -286,15 +285,35 @@ startButton.addEventListener('click', e => {
     case 'Press to unpause': {
       unPause();
       startButton.textContent = 'Press to pause';
-      document.querySelector('.status').textContent = 'Playing';  
+      document.querySelector('.status').textContent = 'Playing';
       break;
     }
   }
 
 })
 
-/*добавить очки*/
-/*добавить паузу*/
+let results = [];
+
+function result() {
+  let countApples = Math.floor(snakeCountBody.length / 30) - 1;
+  let now = new Date;
+  let date = now.getHours() + ':' + now.getMinutes();
+
+
+  const dificulty = document.getElementById('dificulty');
+  const dif = dificulty.value;
+
+  results.push({countApples, date, dif});
+  
+  let resultSpis = document.querySelector('.result');
+  resultSpis.innerHTML = '';
+
+  for (res in results) {
+    let doc = document.createElement('p');
+    doc.textContent = results[res].dif + ' ' + results[res].countApples + ' in ' + results[res].date;
+    resultSpis.appendChild(doc);
+  }
+}
 
 
 
