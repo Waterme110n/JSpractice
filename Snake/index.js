@@ -21,6 +21,7 @@ let movement = 'right'
 let nextmovement = '';
 let snakeCountBody = [{ left: 0, top: 0 }]
 let frameCount = 0;
+let applePos = []
 
 function placeSnake() {
   let positionSnake = board.children[55].getBoundingClientRect();
@@ -56,7 +57,6 @@ function moveSnake() {
   if (snakeCountBody.length > maxLength * 30) {
     snakeCountBody.pop();
   }
-
   switch (nextmovement) {
     case 'left':
       snake.style.left = (currentLeft - 1) + 'px';
@@ -76,8 +76,35 @@ function moveSnake() {
     clearInterval(gameInterval);
   }
 
-  moveSnakeFragment()
+  moveSnakeFragment();
+  appleTouch();
 }
+
+
+function addSnakeFragment() {
+  const lastPart = snakeCountBody[snakeCountBody.length - 1];
+
+  const snakeFragment = document.createElement('div');
+  snakeFragment.classList.add('snakeFrag');
+
+  snakeFragment.style.left = lastPart.left + 'px';
+  snakeFragment.style.top = lastPart.top + 'px';
+  body.appendChild(snakeFragment);
+
+  snakeCountBody.push({ left: lastPart.left, top: lastPart.top });
+}
+
+function moveSnakeFragment() {
+  const fragments = document.querySelectorAll('.snakeFrag');
+  for (let i = 0; i < fragments.length; i++) {
+    const index = (i + 1) * 30;
+    if (snakeCountBody[index]) {
+      fragments[i].style.left = snakeCountBody[index].left + 'px';
+      fragments[i].style.top = snakeCountBody[index].top + 'px';
+    }
+  }
+}
+
 
 function gameOver() {
   const boardPosition = board.getBoundingClientRect();
@@ -107,12 +134,11 @@ function gameOver() {
   }
 }
 
-
-function endGame(){
-    const gameloseText = document.createElement('div');
-    gameloseText.textContent = 'game over';
-    gameloseText.classList.add('gameover');
-    body.appendChild(gameloseText)
+function endGame() {
+  const gameloseText = document.createElement('div');
+  gameloseText.textContent = 'game over';
+  gameloseText.classList.add('gameover');
+  body.appendChild(gameloseText)
 }
 
 document.addEventListener('keydown', e => {
@@ -140,38 +166,63 @@ document.addEventListener('keydown', e => {
   }
 })
 
-createBoard()
-placeSnake()
-let gameInterval = setInterval(moveSnake, snakeSpeed)
-setInterval(addSnakeBody, 5000)
+function createApple() {
 
-/*добавить яблочки и дп рост за них*/
-/*добавить сложности*/
+  let apple = document.createElement('div');
+  apple.classList.add('apple');
 
-/*яблочки*/
+  let appleCell = Math.floor(Math.random() * 99);
 
-function addSnakeBody() {
-  const lastPart = snakeCountBody[snakeCountBody.length - 1];
+  if (applePos.some(item => appleCell == item.index)) {
+    console.log('not');
+    createApple();
+    return;
+  }
 
-  const snakeFragment = document.createElement('div');
-  snakeFragment.classList.add('snakeFrag');
+  const posAppleCell = board.children[appleCell].getBoundingClientRect();
+  apple.style.left = posAppleCell.left + 3 + 'px';
+  apple.style.top = posAppleCell.top + 3 + 'px';
 
-  snakeFragment.style.left = lastPart.left + 'px';
-  snakeFragment.style.top = lastPart.top + 'px';
-  body.appendChild(snakeFragment);
-
-  snakeCountBody.push({left: lastPart.left, top: lastPart.top});
+  if (snakeCountBody.some(item => 
+    Math.round(item.left) === Math.round(posAppleCell.left + 3) &&
+    Math.round(item.top) === Math.round(posAppleCell.top + 3))) 
+    {
+    console.log('in snake');
+    createApple();
+    return;
+  }
+  applePos.push({ index: appleCell, element: apple });
+  body.appendChild(apple);
 }
 
-function moveSnakeFragment() {
-  const fragments = document.querySelectorAll('.snakeFrag');
-  for (let i = 0; i < fragments.length; i++) {
-    const index = (i + 1) * 30;
-    if (snakeCountBody[index]) {
-      fragments[i].style.left = snakeCountBody[index].left + 'px';
-      fragments[i].style.top = snakeCountBody[index].top + 'px';
+function appleTouch() {
+  const snakePosition = snake.getBoundingClientRect();
+  const apples = document.querySelectorAll('.apple');
+
+  for (let i = 0; i < applePos.length; i++) {
+    const { index, element } = applePos[i]
+    const applePosition = board.children[index].getBoundingClientRect();
+
+    if (snakePosition.left < applePosition.right &&
+      snakePosition.right > applePosition.left &&
+      snakePosition.top < applePosition.bottom &&
+      snakePosition.bottom > applePosition.top
+    ) {
+      element.remove();
+      applePos.splice(i, 1);
+      addSnakeFragment();
+
+      createApple();
+      break;
     }
   }
 }
 
 
+createBoard()
+placeSnake()
+createApple()
+let gameInterval = setInterval(moveSnake, snakeSpeed)
+
+
+/*добавить сложности*/
