@@ -138,6 +138,8 @@ function gameOver() {
 function endGame() {
   const gameloseText = document.querySelector('.status');
   gameloseText.textContent = 'Game over';
+  startButton.textContent = 'Start';
+  document.getElementById('dificulty').disabled = false;  
 }
 
 document.addEventListener('keydown', e => {
@@ -239,32 +241,56 @@ function chooseDif() {
 
 createBoard()
 
-function clearBoard(){
+function clearBoard() {
   const snakeFragment = document.querySelectorAll('.snakeFrag');
-  snakeFragment.forEach(el =>{el.remove();})
+  snakeFragment.forEach(el => { el.remove(); })
   const apples = document.querySelectorAll('.apple');
-  apples.forEach(el =>{el.remove();})
+  apples.forEach(el => { el.remove(); })
   snakeCountBody.length = 0;
   applePos.length = 0
   clearInterval(gameInterval);
 }
 
-function startGame(){
-  document.querySelector('.status').textContent = 'Playing';
+function startGame() {
+  document.getElementById('dificulty').disabled = true
   clearBoard();
   chooseDif();
   placeSnake();
   createApple();
   gameInterval = setInterval(moveSnake, snakeSpeed)
 }
-
+function pause() {
+  clearInterval(gameInterval);
+}
+function unPause() {
+  gameInterval = setInterval(moveSnake, snakeSpeed)
+}
 
 
 
 const startButton = document.querySelector('.startgame');
 startButton.addEventListener('click', e => {
+  switch (startButton.textContent) {
+    case 'Start': {
+      startGame();
+      startButton.textContent = 'Press to pause';
+      document.querySelector('.status').textContent = 'Playing';
+      break;
+    }
+    case 'Press to pause': {
+      pause();
+      startButton.textContent = 'Press to unpause';
+      document.querySelector('.status').textContent = 'Pause';
+      break;
+    }
+    case 'Press to unpause': {
+      unPause();
+      startButton.textContent = 'Press to pause';
+      document.querySelector('.status').textContent = 'Playing';  
+      break;
+    }
+  }
 
-  startGame();
 })
 
 /*добавить очки*/
