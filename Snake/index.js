@@ -72,27 +72,47 @@ function moveSnake() {
       break;
   }
 
-  if (gameover() === 1) {
+  if (gameOver() === 1) {
     clearInterval(gameInterval);
   }
 
   moveSnakeFragment()
 }
 
-function gameover() {
-  const boardPosition = board.getBoundingClientRect()
-  const snakePosition = snake.getBoundingClientRect()
-  if (snakePosition.left < boardPosition.left ||
+function gameOver() {
+  const boardPosition = board.getBoundingClientRect();
+  const snakePosition = snake.getBoundingClientRect();
+  if (
+    snakePosition.left < boardPosition.left ||
     snakePosition.top < boardPosition.top ||
     snakePosition.right > boardPosition.right ||
     snakePosition.bottom > boardPosition.bottom
   ) {
+    endGame();
+    return 1;
+  }
+  const fragments = document.querySelectorAll('.snakeFrag');
+
+  for (let i = 2; i < fragments.length - 1; i++) {
+    const fragRect = fragments[i].getBoundingClientRect();
+    if (
+      snakePosition.left < fragRect.right &&
+      snakePosition.right > fragRect.left &&
+      snakePosition.top < fragRect.bottom &&
+      snakePosition.bottom > fragRect.top
+    ) {
+      endGame();
+      return 1;
+    }
+  }
+}
+
+
+function endGame(){
     const gameloseText = document.createElement('div');
     gameloseText.textContent = 'game over';
     gameloseText.classList.add('gameover');
     body.appendChild(gameloseText)
-    return 1;
-  }
 }
 
 document.addEventListener('keydown', e => {
@@ -129,20 +149,18 @@ setInterval(addSnakeBody, 5000)
 /*добавить сложности*/
 
 /*яблочки*/
-//добавляешь дополнительного змея который будет повторять с задержкой 0.5 секунды каждый раз твое движение
 
 function addSnakeBody() {
-  const snakePosition = snake.getBoundingClientRect();
-  snakeCountBody.push({ left: snakePosition.left, top: snakePosition.top })
+  const lastPart = snakeCountBody[snakeCountBody.length - 1];
 
   const snakeFragment = document.createElement('div');
   snakeFragment.classList.add('snakeFrag');
 
-  snakeFragment.style.left = snakePosition.left + 'px';
-  snakeFragment.style.top = snakePosition.top + 'px';
+  snakeFragment.style.left = lastPart.left + 'px';
+  snakeFragment.style.top = lastPart.top + 'px';
   body.appendChild(snakeFragment);
 
-  console.log(snakeCountBody);
+  snakeCountBody.push({left: lastPart.left, top: lastPart.top});
 }
 
 function moveSnakeFragment() {
@@ -155,3 +173,5 @@ function moveSnakeFragment() {
     }
   }
 }
+
+
