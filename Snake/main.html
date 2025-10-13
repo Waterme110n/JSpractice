@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #a4e5d9;
+    }
+
+    .square {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      grid-template-rows: repeat(10, 40px);
+      border: 3px solid #649dad;
+      background-color: #62d3be;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #649dad;
+    }
+
+    .squareH {
+      height: 80vh;
+      width: 80vh;
+    }
+
+    .squareV {
+      height: 80vw;
+      width: 80vw;
+    }
+
+    .snake {
+      z-index: 2;
+      position: absolute;
+      border-radius: 100%;
+      height: 35px;
+      width: 35px;
+      background-color: #0e3150;
+    }
+    .snakeFrag {
+      position: absolute;
+      border-radius: 100%;
+      height: 35px;
+      width: 35px;
+      background-color: #0e3150;
+    }
+
+    .status{
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .apple{
+      z-index: 3;
+      position: absolute;
+      border-radius: 100%;
+      height: 35px;
+      width: 35px;
+      background-color: #810000;
+    }
+
+    .menu{
+      position: absolute;
+      background-color: #62d3be;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      top: 5vh;
+      width: 30vw;
+      height: 20vh;
+      border: 1px solid #649dad;
+    }
+    select{
+      width: 50%;
+    }
+    .startgame{
+      padding: 10px 30px;
+      width: auto;
+      height: auto;
+      margin: 20px;
+      border-radius: 3px;
+      border: 1px solid #649dad;
+      background-color: #2b685d;
+    }
+
+    .result{
+      position: absolute;
+      right: 25vw;
+      width: auto;
+      height: auto;
+      padding: 1px 10px;
+      border: 1px solid #649dad;
+      background-color: #2b685d;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="menu">
+    <p class="status">Pause</p>
+    <select id="dificulty">
+      <option value="easy">easy</option>
+      <option value="medium" selected>medium</option>
+      <option value="hard">hard</option>
+      <option value="imposible">imposible</option>
+    </select>
+    <button class="startgame">Start</button>
+  </div>
+  <div class="square" id="square"></div>
+  <div class="snake" id="snake"></div>
+  <div class="result">
+
+  </div>
+  <script src="index.js"></script>
+</body>
+
+</html>
