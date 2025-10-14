@@ -14,13 +14,85 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      background-color: #ffe2e2;
     }
 
+    .clock {
+      display: block;
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 1000px;
+      border: 10px solid #8785a2;
+      background-color: #ffc7c7;
+    }
 
+    .centerCircle {
+      display: block;
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 1000px;
+      border: none;
+      background-color: #8785a2;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .bigSech {
+      display: block;
+      position: absolute;
+      width: 6px;
+      height: 40px;
+      background-color: #8785a2;
+      border-radius: 10px;
+    }
+
+    .smallSech {
+      display: block;
+      position: absolute;
+      width: 4px;
+      height: 20px;
+      background-color: #8785a2;
+      border-radius: 10px;
+    }
+
+    .hour {
+      display: block;
+      position: absolute;
+      width: 10px;
+      height: 100px;
+      background-color: #8785a2;
+      border-radius: 0 0 10px 10px;
+      transform-origin: top;
+    }
+
+    .minute {
+      display: block;
+      position: absolute;
+      width: 8px;
+      height: 180px;
+      background-color: #8785a2;
+      border-radius: 0 0 10px 10px;
+      transform-origin: top;
+    }
+
+    .second {
+      display: block;
+      position: absolute;
+      width: 2px;
+      height: 210px;
+      background-color: #8785a2;
+      border-radius: 0 0 10px 10px;
+      transform-origin: top;
+    }
   </style>
 </head>
 
-<body>
+<body class="body">
+  <div class="clock">
+
+  </div>
   <script src="index.js"></script>
 </body>
 
