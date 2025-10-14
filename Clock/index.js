@@ -45,10 +45,9 @@ function clockInit() {
   }
 }
 
-
 function ArrowInit() {
   hourArrow.classList.add('hour');
-  hourArrow.style.top = '5px'
+  hourArrow.style.top = '5px' // 10/2
   center.appendChild(hourArrow);
 
   minuteArrow.classList.add('minute'); 
@@ -57,13 +56,23 @@ function ArrowInit() {
   center.appendChild(minuteArrow);
 
   secundArrow.classList.add('second');
-  secundArrow.style.left = '4px' // (10-8)/2
+  secundArrow.style.left = '4px' // (10-2)/2
   secundArrow.style.top = '5px'
   center.appendChild(secundArrow);
   
 }
 
+function ArrowMove(){
+  let time = new Date;
+  let second = time.getSeconds();
+  secundArrow.style.transform = `rotate(${(second)*6 -180}deg)`;
+  let minute = time.getMinutes();
+  minuteArrow.style.transform = `rotate(${(minute+second/60)*6 - 180}deg)`;
+  let hour = time.getHours();
+  hourArrow.style.transform = `rotate(${(hour % 12 + minute / 60)*30 -180}deg)`
 
+}
 
+setInterval(ArrowMove,1000);
 clockInit();
 ArrowInit();
