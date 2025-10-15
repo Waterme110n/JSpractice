@@ -1,7 +1,8 @@
 const body = document.querySelector('.body');
 const buttons = ['a', 's', 'd', 'f', 'g', 'h', 'j'];
 const pianino = document.querySelector('.pianino');
-let char = -1;
+let charNumber = -1;
+let notes = '';
 
 function initButtons() {
     for (let i = 0; i < 7; i++) {
@@ -13,7 +14,7 @@ function initButtons() {
 }
 
 function playNote() {
-    let notes = document.querySelectorAll('.note')
+    notes = document.querySelectorAll('.note')
     for (let j = 1; j < notes.length + 1; j++) {
         notes[j - 1].addEventListener('click', e => {
             let audio = new Audio(`notes/${j}.mp3`);
@@ -22,16 +23,21 @@ function playNote() {
     }
 }
 
-function PressNote() {
-    document.addEventListener('keydown', e => {
-        char = buttons.indexOf(e.key);
-        if (char != -1) {
-            let audio = new Audio(`notes/${char + 1}.mp3`);
-            audio.play();
-        }
-    })
-}
+document.addEventListener('keydown', e => {
+    charNumber = buttons.indexOf(e.key);
+    if (charNumber != -1) {
+        notes[charNumber].classList.add('hover');
+        let audio = new Audio(`notes/${charNumber + 1}.mp3`);
+        audio.play();
+    }
+})
 
-PressNote()
+document.addEventListener('keyup', e => {
+    charNumber = buttons.indexOf(e.key);
+    if (charNumber !== -1) {
+        notes[charNumber].classList.remove('hover');
+    }
+});
+
 initButtons();
 playNote();
