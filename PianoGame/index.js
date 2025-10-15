@@ -1,12 +1,14 @@
 const body = document.querySelector('.body');
 const buttons = ['a', 's', 'd', 'f', 'g', 'h', 'j'];
+const pianino = document.querySelector('.pianino');
 let char = -1;
 
 function initButtons() {
     for (let i = 0; i < 7; i++) {
         let note = document.createElement('div');
         note.classList.add('note');
-        body.appendChild(note);
+        note.innerText = buttons[i];
+        pianino.appendChild(note);
     }
 }
 
