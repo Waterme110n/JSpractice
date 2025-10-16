@@ -12,7 +12,7 @@ const happybithday = [
     [0, 500], [0, 500], [1, 1000], [0, 1000], [3, 1000], [2, 1000],
     [0, 500], [0, 500], [1, 1000], [0, 1000], [4, 1000], [3, 1000],
     [0, 500], [0, 500], [0, 500], [5, 1000], [3, 1000], [2, 1000], [1, 1000],
-    [6, 500], [6, 500], [5, 1000], [3, 1000], [4, 1000], [3, 1000]]
+    [6, 500], [6, 500], [5, 1000], [3, 1000], [4, 1000], [3, 1000]];
 
 
 
@@ -22,11 +22,11 @@ function initButtons() {
         note.classList.add('note');
         note.innerText = buttons[i];
         pianino.appendChild(note);
+        notes.push(note);
     }
 }
 
 function playNote() {
-    notes = document.querySelectorAll('.note')
     for (let j = 1; j < notes.length + 1; j++) {
         notes[j - 1].addEventListener('click', e => {
             let audio = new Audio(`notes/${j}.mp3`);
@@ -75,6 +75,8 @@ function PlaySong(songArr) {
 
             dropElement.style.transform = 'translateY(1000px)';
 
+            pressButtonsThenDropDown(noteIndex, dropElement);
+
             if (i == songArr.length - 1) {
                 setTimeout(() => {
                     start.style.backgroundColor = '#dbe2ef';
@@ -93,8 +95,6 @@ function PlaySong(songArr) {
     }
 }
 
-
-
 function chooseSong() {
 
     switch (Song.value) {
@@ -108,9 +108,27 @@ function chooseSong() {
     }
 }
 
+
+function pressButtonsThenDropDown(dropElementNote, dropElement) {
+    setTimeout(e => { //до области нажатия
+        let everytic = setInterval(e => {
+            const notesPos = notes[dropElementNote].getBoundingClientRect();
+            let elPos = dropElement.getBoundingClientRect();
+            if (notes[dropElementNote].classList.contains('hover')) {
+                if (notesPos.top - 10 < elPos.top && notesPos.bottom + 10 < elPos.bottom) {
+                    console.log('wau');
+                }
+                dropElement.remove();
+            }
+        }, 50);
+        setTimeout(e => { clearInterval(everytic) }, 950) // конец области нажатия
+    }, 4600)
+}
+
+
+
 initButtons();
 playNote();
-
 start.addEventListener('click', e => {
     let button = document.querySelector('.startgame');
     if (button.textContent == 'Start') {
@@ -132,7 +150,6 @@ start.addEventListener('click', e => {
     }
 });
 
-//можно сделать чтобы ловились летящие кубики + pointы
-//доделать меню на кнопку динамичную stop/start меняется text
 
+//point
 
