@@ -7,21 +7,137 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
+      overflow-y: hidden;
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
       text-align: center;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
       height: 100vh;
-      background-color:#dbe2ef;
+      background-color: #dbe2ef;
+    }
+
+    .gameMenu {
+      z-index: 10;
+      position: absolute;
+      background-color: #3f72af;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      top: 5vh;
+      width: 30vw;
+      height: 20vh;
+      border-radius: 20px;
+    }
+
+    select {
+      width: 50%;
+    }
+
+    .status {
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 24px;
+      color: #dbe2ef;
+
+    }
+
+    .startgame {
+      padding: 10px 30px;
+      width: auto;
+      height: auto;
+      margin: 20px;
+      border-radius: 3px;
+      border: 1px solid #112d4e;
+      background-color: #dbe2ef;
+      color: #112d4e;
+    }
+
+    .pianino {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      text-align: center;
+      justify-content: space-around;
+      align-items: end;
+      height: 40vh;
+      width: 70vw;
+      background-color: #dbe2ef;
+    }
+
+    .note {
+      margin: 0;
+      padding: 40px 50px;
+      display: block;
+      background-color: #3f72af;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 24px;
+      color: #dbe2ef;
+      text-align: center;
+      border-radius: 5px;
+      width: auto;
+      height: auto;
+      box-shadow: 0px 20px 0px 20px #112d4e;
+      transition: all 0.2s;
+    }
+
+    .note:hover {
+      transform: translateY(2px);
+      box-shadow: 0px 15px 0px 15px #112d4e;
+    }
+
+    .note.hover {
+      transform: translateY(2px);
+      box-shadow: 0px 15px 0px 15px #112d4e;
+    }
+
+    .dropElement {
+      margin: 0;
+      padding: 40px 0px;
+      display: block;
+      position: absolute;
+      background-color: #3f72af;
+      color: #dbe2ef;
+      border-radius: 10%;
+      width: auto;
+      height: auto;
+      transition: all 10s linear;
+      box-shadow: 0px 0px 5px 0px black;
+    }
+
+    .points {
+      z-index: 10;
+      display: block;
+      position: absolute;
+      top: 5vh;
+      right: 5vh;
+      padding: 5vh;
+      border-radius: 20px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 24px;
+      color: #dbe2ef;
+      background-color: #3f72af;
     }
   </style>
 </head>
 
 <body class="body">
-
-
+  <div class="gameMenu">
+    <p class="status">Choоse your level</p>
+    <select id="dificulty">
+      <option value="hb">Happy birthday</option>
+      <option value="free">Free game</option>
+    </select>
+    <button class="startgame">Start</button>
+  </div>
+  <p class="points">0</p>
+  <div class="pianino"></div>
   <script src="index.js"></script>
 </body>
 
