@@ -4,9 +4,12 @@ const pianino = document.querySelector('.pianino');
 let charNumber = -1;
 let Song = document.getElementById('dificulty');
 let start = document.querySelector('.startgame');
-let statusP = document.querySelector('.status')
+let statusP = document.querySelector('.status');
+let pointP = document.querySelector('.points');
 let notes = [];
 let playTimeouts = [];
+let dropDownQueue = []
+let points = 0;
 let dropDowns;
 const happybithday = [
     [0, 500], [0, 500], [1, 1000], [0, 1000], [3, 1000], [2, 1000],
@@ -108,7 +111,7 @@ function chooseSong() {
     }
 }
 
-let dropDownQueue = []
+
 
 function pressButtonsThenDropDown(dropElementNote, dropElement) {
     dropDownQueue.unshift([dropElementNote, dropElement]);
@@ -116,11 +119,12 @@ function pressButtonsThenDropDown(dropElementNote, dropElement) {
         let everytic = setInterval(e => {
             const notesPos = notes[dropElementNote].getBoundingClientRect();
             let elPos = dropElement.getBoundingClientRect();
+
             if (notes[dropElementNote].classList.contains('hover')) {
                 const sameNoteElements = dropDownQueue.filter(el => el[0] == dropElementNote);
                 const lastEl = sameNoteElements[sameNoteElements.length - 1];
-                if (notesPos.top - 10 < elPos.top && notesPos.bottom + 10 < elPos.bottom) {
-                    console.log('wau');
+                if (notesPos.top + 10 < elPos.top && notesPos.bottom - 20 < elPos.bottom) {
+                    points += 25;
                 }
                 if (lastEl && lastEl[1] == dropElement) {
                     let index = dropDownQueue.findIndex(el => el.dropElement === dropElement);
@@ -128,7 +132,8 @@ function pressButtonsThenDropDown(dropElementNote, dropElement) {
                     setTimeout(() => {
                         dropDownQueue.splice(index, 1);
                     }, 40);
-
+                    points += 25;
+                    pointP.textContent = points;
                 }
             }
         }, 50);
@@ -136,18 +141,20 @@ function pressButtonsThenDropDown(dropElementNote, dropElement) {
     }, 4600)
 }
 
-
-
 initButtons();
 playNote();
+
 start.addEventListener('click', e => {
     let button = document.querySelector('.startgame');
     if (button.textContent == 'Start') {
+        pointP.textContent = 0;
+        points = 0;
         button.style.backgroundColor = 'red';
         button.textContent = 'Stop';
         statusP.textContent = 'Playing...';
         chooseSong();
     } else {
+        dropDownQueue = [];
         button.style.backgroundColor = '#dbe2ef';
         button.textContent = 'Start';
         statusP.textContent = 'Choоse your level';
@@ -160,7 +167,4 @@ start.addEventListener('click', e => {
         });
     }
 });
-
-
-//point
 

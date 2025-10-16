@@ -109,6 +109,21 @@
       transition: all 10s linear;
       box-shadow: 0px 0px 5px 0px black;
     }
+
+    .points {
+      z-index: 10;
+      display: block;
+      position: absolute;
+      top: 5vh;
+      right: 5vh;
+      padding: 5vh;
+      border-radius: 20px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 24px;
+      color: #dbe2ef;
+      background-color: #3f72af;
+    }
   </style>
 </head>
 
@@ -121,6 +136,7 @@
     </select>
     <button class="startgame">Start</button>
   </div>
+  <p class="points">0</p>
   <div class="pianino"></div>
   <script src="index.js"></script>
 </body>
