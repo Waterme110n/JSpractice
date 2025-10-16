@@ -108,17 +108,28 @@ function chooseSong() {
     }
 }
 
+let dropDownQueue = []
 
 function pressButtonsThenDropDown(dropElementNote, dropElement) {
+    dropDownQueue.unshift([dropElementNote, dropElement]);
     setTimeout(e => { //до области нажатия
         let everytic = setInterval(e => {
             const notesPos = notes[dropElementNote].getBoundingClientRect();
             let elPos = dropElement.getBoundingClientRect();
             if (notes[dropElementNote].classList.contains('hover')) {
+                const sameNoteElements = dropDownQueue.filter(el => el[0] == dropElementNote);
+                const lastEl = sameNoteElements[sameNoteElements.length - 1];
                 if (notesPos.top - 10 < elPos.top && notesPos.bottom + 10 < elPos.bottom) {
                     console.log('wau');
                 }
-                dropElement.remove();
+                if (lastEl && lastEl[1] == dropElement) {
+                    let index = dropDownQueue.findIndex(el => el.dropElement === dropElement);
+                    dropElement.remove();
+                    setTimeout(() => {
+                        dropDownQueue.splice(index, 1);
+                    }, 40);
+
+                }
             }
         }, 50);
         setTimeout(e => { clearInterval(everytic) }, 950) // конец области нажатия
