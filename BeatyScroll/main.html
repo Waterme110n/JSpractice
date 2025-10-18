@@ -12,7 +12,12 @@
       --third-color: #1e2022;
     }
 
+    html::-webkit-scrollbar {
+    display: none; 
+    }
+
     body {
+      overflow-x: hidden;
       margin: 0;
       padding: 0;
       display: flex;
@@ -24,11 +29,28 @@
     }
 
     .anyInfo {
-      margin: 300px 300px;
+      margin: 100px 300px 700px 300px;
       font-family: monospace;
       font-weight: bold;
       font-size: 104px;
       color: var(--secondary-color);
+    }
+    
+    .anyInfo2 {
+      margin: 700px 300px 300px 300px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 104px;
+      color: var(--secondary-color);
+    }
+    
+    .scrollDiv{
+      position: absolute;
+      left: 45vw;
+      display: flex;
+      flex-direction: row;
+      gap: 1000px;
+
     }
 
     .carPic{
@@ -45,7 +67,7 @@
 <body class="body">
   <p class="anyInfo">This is website for beatifull scroll</p>
   <div class="scrollDiv"></div>
-  <p class="anyInfo">End of website</p>
+  <p class="anyInfo2">End of website</p>
   <script src="index.js"></script>
 </body>
 
