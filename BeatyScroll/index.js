@@ -56,22 +56,36 @@ function editScroll() {
 }
 
 function srcollHoriz(scroll) {
-  CarAnimations(scroll); 
+
+  for (let i = 0; i < Cars.length; i++) {
+    CarAnimations(scroll, i);
+  }
+
   if (scroll <= 0) {
     return window.scrollTo(0, 599);
-  } else if (scroll > 400 * Cars.length) {
+  } else if (scroll > (1760/4) * Cars.length) {
     return window.scrollTo(0, 701);
   }
 }
 
 
-function CarAnimations(scroll) {
+function CarAnimations(scroll, carNumber) {
   console.log(scroll);
+  if (carNumber == 0) {
     if (scroll >= 0 && scroll <= 260) {
       ScaleCarAnimation(Cars[0].div, scroll);
-    } else if (scroll <= 500){
-       scrollParent.style.transform = `translate(-${(scroll-260)*5}px,0)`;
+    } else if (scroll <= 500) {
+      scrollParent.style.transform = `translate(-${(scroll - 260) * 5}px,0)`;
     }
+  } else {
+    let razn = carNumber * 500;
+    if (scroll >= razn && scroll <= razn + 260) {
+      ScaleCarAnimation(Cars[carNumber].div, scroll - razn);
+    } else if (scroll >= razn + 260 && scroll <= razn + 500) {
+      scrollParent.style.transform = `translate(-${(scroll - (260 * (carNumber + 1))) * 5}px,0)`;
+    }
+  }
+
 }
 
 function ScaleCarAnimation(carElement, scroll) {
