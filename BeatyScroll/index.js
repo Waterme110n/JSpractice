@@ -38,19 +38,51 @@ function initCars() {
   });
 }
 
-//for touchpad
 function editWheel() {
   window.addEventListener('wheel', (event) => {
+    event.preventDefault();
     verticalScroll = window.pageYOffset || document.documentElement.scrollTop;
-    // console.log(verticalScroll)
-    if (verticalScroll >= 600 && verticalScroll <= 700) {
-      event.preventDefault();
-      window.scrollTo(0, 650);
+    console.log(event.deltaY)
+
+    const isMouseWheel = Math.abs(event.deltaY) >= 100;
+    const isTouchpad = Math.abs(event.deltaY) < 99;
+
+    if (isTouchpad) {
       if (event.deltaY < 0) {
-        srcollHoriz(horizontalScroll--);
+        verticalScroll -= 10
+        window.scrollTo(0, verticalScroll);
       } else {
-        srcollHoriz(horizontalScroll++);
+        verticalScroll += 10
+        window.scrollTo(0, verticalScroll);
       }
+
+      if (verticalScroll >= 600 && verticalScroll <= 700) {
+        event.preventDefault();
+        window.scrollTo(0, 650);
+        if (event.deltaY < 0) {
+          srcollHoriz(horizontalScroll--);
+        } else {
+          srcollHoriz(horizontalScroll++);
+        }
+      }
+    } else {
+      if (event.deltaY < 0) {
+        verticalScroll -= 50
+        window.scrollTo(0, verticalScroll);
+      } else {
+        verticalScroll += 50
+        window.scrollTo(0, verticalScroll);
+      }
+      if (verticalScroll >= 600 && verticalScroll <= 700) {
+        event.preventDefault();
+        window.scrollTo(0, 650);
+        if (event.deltaY < 0) {
+          srcollHoriz(horizontalScroll -=10);
+        } else {
+          srcollHoriz(horizontalScroll +=10);
+        }
+      }
+
     }
   }, { passive: false })
 }
@@ -187,4 +219,3 @@ initCars();
 editWheel();
 
 //сделать еще для мышки и для прокрутки страницы
-
