@@ -57,12 +57,16 @@ function editWheel() {
 
 function srcollHoriz(scroll) {
   console.log(scroll);
-  for (let i = 0; i < Cars.length; i++) {
-    CarAnimations(scroll, i);
-  }
-
   if (scroll <= 0) {
     return window.scrollTo(0, 599);
+  } else if (scroll > 0 && scroll <= 500) {
+    CarAnimations(scroll, 0)
+  } else if (scroll > 500 && scroll <= 1000) {
+    CarAnimations(scroll, 1)
+  } else if (scroll > 1000 && scroll <= 1500) {
+    CarAnimations(scroll, 2)
+  } else if (scroll > 1500 && scroll <= 1760) {
+    CarAnimations(scroll, 3)
   } else if (scroll > (1760 / 4) * Cars.length) {
     return window.scrollTo(0, 701);
   }
@@ -88,7 +92,7 @@ function CarAnimations(scroll, carNumber) {
       nextCarColor = Cars[carNumber].color;
     }
     changeBackground(scroll - razn, Cars[carNumber].color, nextCarColor);
-
+    showInfo(scroll - razn, Cars[carNumber]);
     if (scroll >= razn && scroll <= razn + 260) {
       scaleCarAnimation(scroll - razn, Cars[carNumber].div);
     } else if (scroll >= razn + 260 && scroll <= razn + 500) {
@@ -147,30 +151,30 @@ function showInfo(scroll, carElement) {
   let smallInfo = document.querySelector('.smallLine');
 
   let carStartPos = carElement.div.getBoundingClientRect();
-  let startX = carStartPos.left + carStartPos.width/4;
+  let startX = carStartPos.left + carStartPos.width / 4;
 
   bigInfo.style.left = `${startX}px`;
   smallInfo.style.left = `${startX}px`;
   bigInfo.textContent = carElement.company;
   smallInfo.textContent = carElement.model;
-  
+
   if (scroll >= 60 && scroll <= 120) {
     bigInfo.style.display = 'block';
-    bigInfo.style.transform = `translate(${(scroll - 60) * 4.5}px, 0)`;
+    bigInfo.style.transform = `translate(${(scroll - 60) * 4.4}px, 0)`;
     bigInfo.style.width = `${(scroll - 60) * 50}px`;
   }
   if (scroll >= 80 && scroll <= 140) {
     smallInfo.style.display = 'block';
-    smallInfo.style.transform = `translate(${(scroll - 80) * 4.5}px, 0)`;
+    smallInfo.style.transform = `translate(${(scroll - 80) * 4.4}px, 0)`;
     smallInfo.style.width = `${(scroll - 80) * 50}px`;
   }
   if (scroll >= 160 && scroll < 200) {
     bigInfo.style.display = 'block';
-    bigInfo.style.transform = `translate(${270 - ((scroll - 160) * 7.5)}px,0)`;
+    bigInfo.style.transform = `translate(${264 - ((scroll - 160) * 7.5)}px,0)`;
     bigInfo.style.width = `${(3000 - (scroll - 160) * 75)}px`;
-    
+
     smallInfo.style.display = 'block';
-    smallInfo.style.transform = `translate(${270 - ((scroll - 160) * 7.5)}px,0)`;
+    smallInfo.style.transform = `translate(${264 - ((scroll - 160) * 7.5)}px,0)`;
     smallInfo.style.width = `${(3000 - (scroll - 160) * 75)}px`;
   }
   if (scroll < 60 || scroll > 200) {
