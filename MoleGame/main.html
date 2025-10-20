@@ -8,7 +8,7 @@
   <style>
     * {
       --main-color: #f9ed69;
-      --secondary-color: #c9d6df;
+      --secondary-color: #f08a5d;
       --third-color: #1e2022;
     }
 
@@ -19,20 +19,59 @@
     body {
       overflow-x: hidden;
       margin: 0;
-      padding: 0;
+      padding: 300px;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       text-align: center;
-      justify-content: center;
-      align-items: center;
+      justify-content: space-between;
+      align-items: end;
       background-color: var(--main-color);
     }
 
+    .pit {
+      z-index: 10;
+      margin-top: 100px;
+      background-image: url(images/strawbery.png);
+      background-position: center;
+      background-size: cover;
+      width: 300px;
+      height: 210px;
+    }
 
+    .nastya{
+      cursor: pointer;
+      position: absolute;
+      display: none;
+      background-image: url(images/nastya.png);
+      background-position: center;
+      background-size: cover;
+      width: 160px;
+      height: 180px;
+    }
+
+    .points {
+      z-index: 10;
+      display: block;
+      position: absolute;
+      top: 5vh;
+      right: 5vh;
+      padding: 5vh;
+      border-radius: 20px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 24px;
+      color: #dbe2ef;
+      background-color: var(--secondary-color);
+    }
   </style>
 </head>
 
 <body class="body">
+  <div class="pit"></div>
+  <div class="pit"></div>
+  <div class="pit"></div>
+  <div class="nastya"></div>
+  <div class="points">0</div>
   <script src="index.js"></script>
 </body>
 
