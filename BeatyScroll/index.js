@@ -39,7 +39,7 @@ function initCars() {
 }
 
 //for touchpad
-function editScroll() {
+function editWheel() {
   window.addEventListener('wheel', (event) => {
     verticalScroll = window.pageYOffset || document.documentElement.scrollTop;
     // console.log(verticalScroll)
@@ -71,7 +71,9 @@ function srcollHoriz(scroll) {
 
 function CarAnimations(scroll, carNumber) {
   if (carNumber == 0) {
+    showInfo(scroll, Cars[0]);
     changeBackground(scroll, Cars[0].color, Cars[1].color);
+
     if (scroll >= 0 && scroll <= 260) {
       scaleCarAnimation(scroll, Cars[0].div);
     } else if (scroll <= 500) {
@@ -86,6 +88,7 @@ function CarAnimations(scroll, carNumber) {
       nextCarColor = Cars[carNumber].color;
     }
     changeBackground(scroll - razn, Cars[carNumber].color, nextCarColor);
+
     if (scroll >= razn && scroll <= razn + 260) {
       scaleCarAnimation(scroll - razn, Cars[carNumber].div);
     } else if (scroll >= razn + 260 && scroll <= razn + 500) {
@@ -108,11 +111,10 @@ function scaleCarAnimation(scroll, carElement) {
 
 function changeBackground(scroll, carColor, nextCarColor) {
   if (scroll > 260 && scroll < 500) {
-    console.log(123)
     var percentage = (scroll - 260) / (500 - 260);
     var color = interpolateColors(carColor, nextCarColor, percentage);
     body.style.background = color;
-  } 
+  }
 }
 
 function interpolateColors(color1, color2, percentage) {
@@ -140,10 +142,45 @@ function hexToRgb(hex) {
   } : null;
 }
 
+function showInfo(scroll, carElement) {
+  let bigInfo = document.querySelector('.bigLine');
+  let smallInfo = document.querySelector('.smallLine');
+
+  let carStartPos = carElement.div.getBoundingClientRect();
+  let startX = carStartPos.left + carStartPos.width/4;
+
+  bigInfo.style.left = `${startX}px`;
+  smallInfo.style.left = `${startX}px`;
+  bigInfo.textContent = carElement.company;
+  smallInfo.textContent = carElement.model;
+  
+  if (scroll >= 60 && scroll <= 120) {
+    bigInfo.style.display = 'block';
+    bigInfo.style.transform = `translate(${(scroll - 60) * 4.5}px, 0)`;
+    bigInfo.style.width = `${(scroll - 60) * 50}px`;
+  }
+  if (scroll >= 80 && scroll <= 140) {
+    smallInfo.style.display = 'block';
+    smallInfo.style.transform = `translate(${(scroll - 80) * 4.5}px, 0)`;
+    smallInfo.style.width = `${(scroll - 80) * 50}px`;
+  }
+  if (scroll >= 160 && scroll < 200) {
+    bigInfo.style.display = 'block';
+    bigInfo.style.transform = `translate(${270 - ((scroll - 160) * 7.5)}px,0)`;
+    bigInfo.style.width = `${(3000 - (scroll - 160) * 75)}px`;
+    
+    smallInfo.style.display = 'block';
+    smallInfo.style.transform = `translate(${270 - ((scroll - 160) * 7.5)}px,0)`;
+    smallInfo.style.width = `${(3000 - (scroll - 160) * 75)}px`;
+  }
+  if (scroll < 60 || scroll > 200) {
+    bigInfo.style.display = 'none';
+    smallInfo.style.display = 'none';
+  }
+}
+
 initCars();
-editScroll();
+editWheel();
 
-
-
-
+//сделать еще для мышки и для прокрутки страницы
 
