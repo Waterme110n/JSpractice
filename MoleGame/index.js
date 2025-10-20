@@ -1,6 +1,7 @@
-let body = document.body;
-let pits = document.querySelectorAll('.pit');
-let nastya = document.querySelector('.nastya');
+const body = document.body;
+const pits = document.querySelectorAll('.pit');
+const nastya = document.querySelector('.nastya');
+const pointsDiv = document.querySelector('.points')
 let points = 0;
 let nastyaInterval;
 
@@ -23,18 +24,22 @@ function moveNastya() {
     if (nastyaPos.top > max) {
       nastya.style.top = nastyaPos.top - 3 + 'px';
     } else {
+      points -= 25
+      pointsDiv.textContent = points
       clearInterval(nastyaInterval);
       nastya.style.display = 'none';
-      setTimeout(showNastya, 1000);
+      setTimeout(showNastya, speed*10);
     }
   }, speed);
 }
 
 nastya.addEventListener('click', () => {
   points += 50
+  pointsDiv.textContent = points
   clearInterval(nastyaInterval);
   nastya.style.display = 'none';
   setTimeout(showNastya, 1000);
 })
 
+// can add menu and dificulties but do this in another projects
 showNastya();
