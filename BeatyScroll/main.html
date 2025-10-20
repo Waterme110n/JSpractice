@@ -6,20 +6,105 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      --main-color: #52616b;
+      --secondary-color: #c9d6df;
+      --third-color: #1e2022;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
+    }
+
     body {
+      overflow-x: hidden;
       margin: 0;
       padding: 0;
       display: flex;
+      flex-direction: column;
       text-align: center;
       justify-content: center;
       align-items: center;
-      background-color: #c9d6df;
+      background-color: var(--main-color);
+    }
+
+    .anyInfo {
+      margin: 100px 300px 700px 300px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 104px;
+      color: var(--secondary-color);
+    }
+
+    .anyInfo2 {
+      margin: 700px 300px 300px 300px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 104px;
+      color: var(--secondary-color);
+    }
+
+    .scrollDiv {
+      z-index: 10;
+      position: absolute;
+      left: 45vw;
+      display: flex;
+      flex-direction: row;
+      gap: 1000px;
+
+    }
+
+    .carPic {
+      z-index: 10;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      object-fit: cover;
+      width: 200px;
+      height: 400px;
+    }
+
+    .bigLine {
+      z-index: 0;
+      display: none;
+      position: absolute;
+      font-family: monospace;
+      font-weight: bold;
+      width: auto;
+      height: auto;
+      padding: 10px 0 10px 70px;
+      font-size: 60px;
+      top: 1000px;
+      left: 350px;
+      text-align: left;
+      color: var(--secondary-color);
+      background-color: var(--third-color);
+    }
+
+    .smallLine {
+      display: none;
+      position: absolute;
+      font-family: monospace;
+      font-weight: bold;
+      height: auto;
+      width: auto;
+      text-align: left;
+      top: 1100px;
+      left: 350px;
+      padding: 10px 0 10px 70px;
+      font-size: 40px;
+      color: var(--secondary-color);
+      background-color: var(--third-color);
     }
   </style>
 </head>
 
 <body class="body">
-
+  <p class="anyInfo">This is website for beatifull scroll</p>
+  <div class="scrollDiv"></div>
+  <div class="bigLine">123123123</div>
+  <div class="smallLine">1231231231</div>
+  <p class="anyInfo2">End of website</p>
   <script src="index.js"></script>
 </body>
 
