@@ -1,33 +1,23 @@
 const scrollParent = document.querySelector('.scrollDiv');
 const body = document.body;
-let Car = {
-  name: '',
-  color: '',
-  image: '',
-  company: '',
-  model: '',
-  div: '',
-  initCar(name, color, image, company, model) {
+function Car(name, color, image, company, model) {
     this.name = name;
     this.color = color;
     this.image = image;
     this.company = company;
     this.model = model;
     return this;
-  }
 }
+
 let Cars = [];
 let verticalScroll = 0;
 let horizontalScroll = 1;
 
 function initCars() {
-  for (i = 0; i < 4; i++) {
-    Cars[i] = Object.assign({}, Car)
-  }
-  Cars[0].initCar('Porshe1', '#52616b', '3.png', 'Porshe', '911 GT2 RS');
-  Cars[1].initCar('Porshe2', '#323232', '1.png', 'Porshe', '911 Carrera');
-  Cars[2].initCar('Porshe3', '#09221b', '4.png', 'Porshe', '911 GT3');
-  Cars[3].initCar('Porshe4', '#16120e', '2.png', 'Porshe', '911 GT3 RS');
+  Cars[0] = new Car('Porshe1', '#52616b', '3.png', 'Porshe', '911 GT2 RS');
+  Cars[1] = new Car('Porshe2', '#323232', '1.png', 'Porshe', '911 Carrera');
+  Cars[2] = new Car('Porshe3', '#09221b', '4.png', 'Porshe', '911 GT3');
+  Cars[3] = new Car('Porshe4', '#16120e', '2.png', 'Porshe', '911 GT3 RS');
 
   Cars.forEach(car => {
     let carPic = document.createElement('img');
@@ -44,7 +34,6 @@ function editWheel() {
     verticalScroll = window.pageYOffset || document.documentElement.scrollTop;
     console.log(event.deltaY)
 
-    const isMouseWheel = Math.abs(event.deltaY) >= 100;
     const isTouchpad = Math.abs(event.deltaY) < 99;
 
     if (isTouchpad) {
@@ -118,7 +107,7 @@ function CarAnimations(scroll, carNumber) {
   } else {
     let razn = carNumber * 500;
 
-    if (Cars[carNumber + 1] !== undefined) {
+    if (Cars?.[carNumber + 1]) {
       nextCarColor = Cars[carNumber + 1].color;
     } else {
       nextCarColor = Cars[carNumber].color;
