@@ -7,9 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * {
-      --main-color: #52616b;
-      --secondary-color: #c9d6df;
-      --third-color: #1e2022;
+      --main-color: #fbf0f0;
+      --secondary-color: #dfd3d3;
+      --third-color: #b8b0b0;
+      --fourth-color: #7c7575;
+      --font: 'Trebuchet MS';
+      margin: 0;
+      padding: 0;
     }
 
     html::-webkit-scrollbar {
@@ -28,8 +32,101 @@
       background-color: var(--main-color);
     }
 
+    .sideMenu {
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      left: 0px;
+      top: 0px;
+      height: 100vh;
+      width: 12vw;
+      background-color: var(--secondary-color);
+    }
+
+    .sideMenu .tasks, .sideMenu .lists {
+      padding: 10px;
+    }
+
+    .tasks ul {
+      text-decoration: none;
+      list-style: none;
+    }
+
+    .tasks h3 {
+      margin: 6px 0 12px 0;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: var(--font)
+    }
+
+    .tasks ul li {
+      text-align: left;
+      height: auto;
+      line-height: 1;
+    }
+
+    .tasks ul li button {
+      font-family: var(--font);
+      font-weight: lighter;
+      line-height: 1;
+      border: none;
+      border-radius: 3px;
+      text-align: left;
+      padding: 5px;
+      background-color: transparent;
+      width: 100%;
+      font-size: 12px;
+    }
+
+    .tasks ul li button:hover {
+      background-color: var(--third-color);
+    }
+
+    .tasks ul li button:active {
+      background-color: var(--fourth-color);
+    }
+
+    .lists h3 {
+      margin: 12px 0 12px 0;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: var(--font)
+    }
+
+    .createList{
+      font-family: var(--font);
+      font-weight: lighter;
+      line-height: 1;
+      border: none;
+      border-radius: 3px;
+      text-align: left;
+      padding: 5px;
+      background-color: transparent;
+      width: 100%;
+      font-size: 12px;
+    }
+
   </style>
 </head>
+<aside class="sideMenu">
+  <div class="tasks">
+    <h3>Tasks</h3>
+    <ul>
+      <li><button>Search</button></li>
+      <li><button>Create</button></li>
+      <li><button>All</button></li>
+      <li><button>Calendar</button></li>
+      <li><button>Filters</button></li>
+    </ul>
+  </div>
+  <div class="lists">
+    <h3>Lists</h3>
+    <ul>
+      <li></li>
+    </ul>
+  </div>
+
+</aside>
 
 <body class="body">
 </body>
