@@ -20,9 +20,6 @@ function saveState(Tasks) {
   localStorage.setItem('Tasks', jsonTasks);
 }
 
-function returnState() {
-  showAllTasks();
-}
 
 loadState()
 
@@ -61,7 +58,7 @@ dialogTask.addEventListener('submit', function (event) {
     Tasks[currentAction] = new Task()
   }
   saveState(Tasks);
-  returnState();
+  showAllTasks();
   dialogTask.close();
 
 })
@@ -124,8 +121,8 @@ showAllTasks();
 
 
 function initButtons() {
-  const Edits = document.querySelectorAll('.divTaskEdit')
-  Edits.forEach((button, index) => {
+  const edits = document.querySelectorAll('.divTaskEdit')
+  edits.forEach((button, index) => {
     button.addEventListener('click', () => {
       dialogTask.showModal();
       document.getElementById('taskName').value = Tasks[index].name;
@@ -135,6 +132,15 @@ function initButtons() {
       document.getElementById('taskProjects').value = Tasks[index].project;
       currentAction = index;
 
+    })
+  });
+
+  const deletes = document.querySelectorAll('.divTaskDel')
+  deletes.forEach((button, index) => {
+    button.addEventListener('click', () =>{
+      Tasks.splice(index,1);
+      saveState(Tasks);
+      showAllTasks();
     })
   });
 }
