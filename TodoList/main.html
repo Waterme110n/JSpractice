@@ -7,9 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * {
-      --main-color: #52616b;
-      --secondary-color: #c9d6df;
-      --third-color: #1e2022;
+      --main-color: #fbf0f0;
+      --secondary-color: #dfd3d3;
+      --third-color: #b8b0b0;
+      --fourth-color: #7c7575;
+      --font: 'Trebuchet MS';
+      margin: 0;
+      padding: 0;
     }
 
     html::-webkit-scrollbar {
@@ -20,18 +24,330 @@
       overflow-x: hidden;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      text-align: center;
-      justify-content: center;
-      align-items: center;
+      height: 100vh;
+      width: 100vw;
       background-color: var(--main-color);
     }
 
+    .sideMenu {
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      left: 0px;
+      top: 0px;
+      height: 100vh;
+      width: 18vw;
+      background-color: var(--secondary-color);
+    }
+
+    .sideMenu .tasks,
+    .sideMenu .lists {
+      padding: 10px;
+    }
+
+    .tasks ul {
+      text-decoration: none;
+      list-style: none;
+    }
+
+    .tasks h3 {
+      margin: 6px 0 12px 0;
+      font-size: 32px;
+      font-weight: bold;
+      font-family: var(--font)
+    }
+
+    .tasks ul li {
+      text-align: left;
+      height: auto;
+      line-height: 1;
+    }
+
+    .tasks ul li button {
+      font-family: var(--font);
+      font-weight: lighter;
+      line-height: 1;
+      border: none;
+      border-radius: 3px;
+      text-align: left;
+      padding: 10px;
+      background-color: transparent;
+      width: 100%;
+      font-size: 20px;
+    }
+
+    .tasks ul li button:hover {
+      background-color: var(--third-color);
+    }
+
+    .tasks ul li button:active {
+      background-color: var(--fourth-color);
+    }
+
+    .lists h3 {
+      margin: 0px 0 12px 0;
+      font-size: 28px;
+      font-weight: bold;
+      font-family: var(--font)
+    }
+
+    /*--------------------------------Right----------------------------------------*/
+
+    .main {
+      width: 82vw;
+      height: 100vh;
+      margin-left: 18vw;
+      padding-top: 10px;
+      display: block;
+    }
+
+    /*--------------------------------modal create----------------------------------------*/
+    #createWindowTask {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--main-color);
+      border: none;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      width: 90%;
+      font-family: var(--font);
+    }
+
+    .task-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .task-form h3 {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--fourth-color);
+      margin-bottom: 10px;
+    }
+
+    .task-form input,
+    .task-form select {
+      padding: 10px;
+      font-size: 16px;
+      font-family: var(--font);
+      border: 1px solid var(--third-color);
+      border-radius: 5px;
+      background-color: var(--secondary-color);
+      color: var(--fourth-color);
+      outline: none;
+    }
+
+    .task-form input::placeholder {
+      color: var(--third-color);
+    }
+
+    .task-form select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%237c7575" d="M6 9L2 5h8z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .horizontal-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .horizontal-group input,
+    .horizontal-group select {
+      flex: 1;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-family: var(--font);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      background-color: var(--third-color);
+      color: var(--main-color);
+    }
+
+    .cancel-btn:hover {
+      background-color: var(--fourth-color);
+    }
+
+    .ok-btn {
+      background-color: var(--fourth-color);
+      color: var(--main-color);
+    }
+
+    .ok-btn:hover {
+      background-color: #5a5353;
+    }
+
+    /*--------------------------------All Tasks----------------------------------------*/
+
+    .divTasks {
+      word-break: break-all;
+      white-space: normal;
+      display: flex;
+      height: auto;
+      padding: 10px;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+
+    .divTasks .divTaskCard {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      margin: 20px 10px 10px  10px;
+      border: none;
+      border-radius: 8px;
+      width: 250px;
+      height: 250px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      font-family: var(--font);
+      background-color: var(--main-color);
+    }
+
+    .divTaskCard h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.5rem;
+      color: var(--fourth-color);
+      font-family: var(--font);
+    }
+
+    .divTaskDesc {
+      margin: 10px 0;
+      font-size: 1rem;
+      color: var(--fourth-color);
+      font-family: var(--font);
+    }
+
+    .divTaskdate {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--third-color);
+      font-family: var(--font);
+    }
+
+    .divTaskPrior {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--secondary-color);
+      font-family: var(--font);
+    }
+
+    .divTaskProj {
+      margin: 10px 0;
+      font-size: 0.9rem;
+      color: var(--third-color);
+      font-family: var(--font);
+    }
+
+    .divTaskCard .TaskCardActions {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .divTaskEdit,
+    .divTaskDel {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 5px;
+      color: var(--fourth-color);
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .divTaskEdit::before {
+      content: "✏️";
+    }
+
+    .divTaskDel::before {
+      content: "🗑️";
+    }
+
+    .divTaskEdit:hover,
+    .divTaskDel:hover {
+      transform: scale(1.2);
+      color: var(--secondary-color);
+    }
   </style>
 </head>
 
 <body class="body">
+  <aside class="sideMenu">
+    <div class="tasks">
+      <h3>Tasks</h3>
+      <ul>
+        <li><button id="searchTask">Search</button></li>
+        <li><button id="createTask">Create</button></li>
+        <li><button id="allTask">All</button></li>
+        <li><button id="CalendarTask">Calendar</button></li>
+        <li><button id="filters">Filters</button></li>
+      </ul>
+    </div>
+    <div class="lists">
+      <h3>Lists</h3>
+      <ul>
+        <li></li>
+      </ul>
+    </div>
+  </aside>
+  <div class="main">
+  </div>
+  <dialog id="createWindowTask">
+    <form method="dialog" class="task-form">
+      <h3>Create New Task</h3>
+      <input id="taskName" placeholder="Enter task name" required>
+      <input id="taskDesc" placeholder="Enter description">
+      <div class="horizontal-group">
+        <input type="date" id="taskDate">
+        <select id="taskPriority">
+          <option value="UnImportant">Unimportant</option>
+          <option value="Common">Common</option>
+          <option value="Important">Important</option>
+          <option value="Very Important">Very Important</option>
+        </select>
+        <select id="taskProjects">
+          <option value="" disabled selected>Choose project</option>
+          <option value="project1">Project 1</option>
+        </select>
+      </div>
+      <div class="form-buttons">
+        <button type="button" class="cancel-btn">Cancel</button>
+        <button type="submit" class="ok-btn">OK</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="index.js"></script>
 </body>
 
 </html>
