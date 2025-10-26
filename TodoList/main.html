@@ -197,6 +197,110 @@
     .ok-btn:hover {
       background-color: #5a5353;
     }
+
+    /*--------------------------------All Tasks----------------------------------------*/
+
+    .divTasks {
+      word-break: break-all;
+      white-space: normal;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+
+    .divTasks .divTaskCard {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      margin: 30px 10px 0 10px;
+      border: none;
+      border-radius: 8px;
+      width: 20%;
+      height: 25%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      font-family: var(--font);
+      background-color: var(--main-color);
+    }
+
+    .divTaskCard h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.5rem;
+      color: var(--fourth-color);
+      font-family: var(--font);
+    }
+
+    .divTaskDesc {
+      margin: 10px 0;
+      font-size: 1rem;
+      color: var(--fourth-color);
+      font-family: var(--font);
+    }
+
+    .divTaskdate {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--third-color);
+      font-family: var(--font);
+    }
+
+    .divTaskPrior {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--secondary-color);
+      font-family: var(--font);
+    }
+
+    .divTaskProj {
+      margin: 10px 0;
+      font-size: 0.9rem;
+      color: var(--third-color);
+      font-family: var(--font);
+    }
+
+    .divTaskCard .TaskCardActions {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .divTaskEdit,
+    .divTaskDel {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 5px;
+      color: var(--fourth-color);
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .divTaskEdit::before {
+      content: "✏️";
+    }
+
+    .divTaskDel::before {
+      content: "🗑️";
+    }
+
+    .divTaskEdit:hover,
+    .divTaskDel:hover {
+      transform: scale(1.2);
+      color: var(--secondary-color);
+    }
   </style>
 </head>
 
@@ -229,11 +333,10 @@
       <div class="horizontal-group">
         <input type="date" id="taskDate">
         <select id="taskPriority">
-          <option value="" disabled selected>Choose priority</option>
-          <option value="veryImportant">Very Important</option>
-          <option value="important">Important</option>
-          <option value="common">Common</option>
-          <option value="unImportant">Unimportant</option>
+          <option value="UnImportant">Unimportant</option>
+          <option value="Common">Common</option>
+          <option value="Important">Important</option>
+          <option value="Very Important">Very Important</option>
         </select>
         <select id="taskProjects">
           <option value="" disabled selected>Choose project</option>
