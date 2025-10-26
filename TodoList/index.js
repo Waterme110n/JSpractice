@@ -1,7 +1,7 @@
 let jsonTasks = '';
 let Tasks = [];
 
-function Task(name, desc = undefined, date = undefined, priority = undefined, project) {
+function Task(name, desc, date, priority, project) {
   this.name = name,
     this.desc = desc,
     this.date = date,
@@ -20,6 +20,10 @@ function saveState(Tasks) {
   localStorage.setItem('Tasks', jsonTasks);
 }
 
+function returnState() {
+  showAllTasks();
+}
+
 loadState()
 
 /*----------------------------------СreateTask---------------------------------------*/
@@ -27,7 +31,21 @@ const createTask = document.getElementById('createTask');
 const dialogTask = document.getElementById('createWindowTask');
 const dialogTaskCancelButton = document.querySelector('.cancel-btn');
 
+const modalName = document.getElementById('taskName')
+const modalDesc = document.getElementById('taskDesc')
+const modalDate = document.getElementById('taskDate')
+const modalPrior = document.getElementById('taskPriority')
+const modalProj = document.getElementById('taskProjects')
+
+let currentAction = -1;
+
 createTask.addEventListener('click', function () {
+  modalName.value = '';
+  modalDesc.value = '';
+  modalDate.value = '';
+  modalPrior.value = 'UnImportant';
+  modalProj.value = '';
+  currentAction = -1;
   dialogTask.showModal();
 })
 
@@ -37,20 +55,21 @@ dialogTaskCancelButton.addEventListener('click', function () {
 
 dialogTask.addEventListener('submit', function (event) {
   event.preventDefault();
-  const name = document.getElementById('taskName').value;
-  const desc = document.getElementById('taskDesc').value;
-  const date = document.getElementById('taskDate').value;
-  const prior = document.getElementById('taskPriority').value;
-  const proj = document.getElementById('taskProjects').value;
-  Tasks.push(new Task(name, desc, date, prior, proj));
+  if (currentAction == -1) {
+    Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value));
+  } else {
+    Tasks[currentAction] = new Task()
+  }
   saveState(Tasks);
-  showAllTasks();
+  returnState();
   dialogTask.close();
+
 })
 
 /*----------------------------------All Task---------------------------------------*/
 const allTaskButton = document.getElementById('allTask');
 const main = document.querySelector('.main');
+
 allTaskButton.addEventListener('click', showAllTasks);
 
 function showAllTasks() {
@@ -77,34 +96,55 @@ function showAllTasks() {
     `
     ).join('')
   }
-
+  initButtons();
 }
 
 function ColorPriority(priority) {
   let color = 'color : #dfd3d3;'
   switch (priority) {
-    case 'veryImportant': {
-      color = 'color : #810606;';
+    case 'Very Important': {
+      color = 'color : #ce0000;';
       return color;
-      break;
     }
-    case 'important': {
+    case 'Important': {
       color = 'color : #792e2e;';
       return color;
-      break;
     }
-    case 'common': {
+    case 'Common': {
       color = 'color : #d6aaaa;';
       return color;
-      break;
     }
-    case 'unImportant': {
+    case 'UnImportant': {
       return color;
-      break;
     }
   }
 }
 
+showAllTasks();
 
-showAllTasks() 
+
+function initButtons() {
+  const Edits = document.querySelectorAll('.divTaskEdit')
+  Edits.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      dialogTask.showModal();
+      document.getElementById('taskName').value = Tasks[index].name;
+      document.getElementById('taskDesc').value = Tasks[index].desc;
+      document.getElementById('taskDate').value = Tasks[index].date;
+      document.getElementById('taskPriority').value = Tasks[index].priority;
+      document.getElementById('taskProjects').value = Tasks[index].project;
+      currentAction = index;
+
+    })
+  });
+}
+
+
+
+
+
+
+
+
+
 //загружать project в add из сущ проject
