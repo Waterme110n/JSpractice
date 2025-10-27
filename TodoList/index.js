@@ -158,7 +158,43 @@ function initCalendar() {
     </div>
     <div class='calendarTask'></div>
     `;
-  let calendar = document.querySelector('.calendarTask')
+
+  let calendar = document.querySelector('.calendarTask');
+  addDateCalendar(calendar);
+  addCellWithTime(calendar);
+}
+
+function addDateCalendar(calendar) {
+  let today = new Date()
+  let week = daysInWeeks(today)
+  calendar.innerHTML += `
+    <div class="calendar-header"></div>`
+  calendar.innerHTML += week.map(weekday => `
+    <div class='calendar-header'>${weekday.day+ ' '+ weekday.date}</div>
+    `).join('')
+}
+
+function daysInWeeks(today) {
+  const currentDate = new Date(today);
+  const dayOfWeek = currentDate.getDay();
+  const daysToMon = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  currentDate.setDate(currentDate.getDate() - daysToMon);
+
+  let week = [];
+
+  for (i = 0; i < 7; i++) {
+    const date = new Date(currentDate);
+    date.setDate(currentDate.getDate() + i);
+    week.push({
+      day: date.toString().slice(0, 3),
+      date: date.toString().slice(8, 10)
+    })
+  }
+  return week
+}
+
+function addCellWithTime(calendar) {
+
   let timeZone = [];
   for (i = 0; i < 192; i++) {
     if (i % 8 == 0) {
@@ -167,21 +203,11 @@ function initCalendar() {
       timeZone.push('')
     }
   }
-  calendar.innerHTML = `
-    <div class="calendar-header"></div>
-    <div class="calendar-header">Пн</div>
-    <div class="calendar-header">Вт</div>
-    <div class="calendar-header">Ср</div>
-    <div class="calendar-header">Чт</div>
-    <div class="calendar-header">Пт</div>
-    <div class="calendar-header">Сб</div>
-    <div class="calendar-header">Вс</div>`
+
   calendar.innerHTML += timeZone.map(time => `
     <div class="calendar-day">${time}</div>
     `).join('');
 }
-
-
 
 
 
