@@ -142,8 +142,13 @@ function initButtons() {
 
 /*----------------------------------Calendar---------------------------------------*/
 const CalendarButton = document.getElementById('CalendarTask');
+let nextWeekButton = '';
+let prevWeekButton = '';
+let today = new Date();
 
-CalendarButton.addEventListener('click', initCalendar);
+CalendarButton.addEventListener('click', () => {
+  initCalendar();
+});
 
 function initCalendar() {
   let calendarFlow = document.createElement('div');
@@ -158,19 +163,22 @@ function initCalendar() {
     </div>
     <div class='calendarTask'></div>
     `;
+  nextWeekButton = document.querySelector('.nextWeek');
+  prevWeekButton = document.querySelector('.prevWeek');
+  AddWeekListeners(prevWeekButton, nextWeekButton);
 
   let calendar = document.querySelector('.calendarTask');
   addDateCalendar(calendar);
   addCellWithTime(calendar);
+
 }
 
 function addDateCalendar(calendar) {
-  let today = new Date()
   let week = daysInWeeks(today)
   calendar.innerHTML += `
     <div class="calendar-header"></div>`
   calendar.innerHTML += week.map(weekday => `
-    <div class='calendar-header'>${weekday.day+ ' '+ weekday.date}</div>
+    <div class='calendar-header'>${weekday.day + ' ' + weekday.date}</div>
     `).join('')
 }
 
@@ -181,20 +189,28 @@ function daysInWeeks(today) {
   currentDate.setDate(currentDate.getDate() - daysToMon);
 
   let week = [];
+  let weekText = [];
 
   for (i = 0; i < 7; i++) {
     const date = new Date(currentDate);
     date.setDate(currentDate.getDate() + i);
+
     week.push({
       day: date.toString().slice(0, 3),
       date: date.toString().slice(8, 10)
     })
+    if (i == 0 || i == 6) {
+      weekText.push(date.toString().slice(4,10))
+    }
   }
+
+  let headWeek = document.querySelector('.currentWeek');
+  headWeek.textContent = weekText.join(' - ');
+
   return week
 }
 
 function addCellWithTime(calendar) {
-
   let timeZone = [];
   for (i = 0; i < 192; i++) {
     if (i % 8 == 0) {
@@ -207,6 +223,17 @@ function addCellWithTime(calendar) {
   calendar.innerHTML += timeZone.map(time => `
     <div class="calendar-day">${time}</div>
     `).join('');
+}
+
+function AddWeekListeners(prev, next) {
+  prev.addEventListener('click', () => {
+    today.setDate(today.getDate() - 7)
+    initCalendar();
+  });
+  next.addEventListener('click', () => {
+    today.setDate(today.getDate() + 7)
+    initCalendar();
+  })
 }
 
 
