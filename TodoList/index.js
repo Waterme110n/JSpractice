@@ -74,7 +74,6 @@ function showAllTasks() {
   divTasks.classList.add('divTasks');
   main.innerHTML = '';
   main.appendChild(divTasks);
-
   if (Tasks.length == 0) {
     divTasks.innerHTML = 'Create Any Task'
   } else {
@@ -82,7 +81,7 @@ function showAllTasks() {
       <div class="divTaskCard">
         <h2>${task.name}</h2>
         <p class="divTaskDesc">${task.desc}</p>
-        <p class="divTaskdate">${task.date}</p>
+        <p class="divTaskdate">${task.date.slice(0, 10)}</p>
         <p class="divTaskPrior" style="${ColorPriority(task.priority)}">${task.priority}</p>
         <p class="divTaskProj">${task.project}</p>
         <div class="TaskCardActions">
@@ -117,40 +116,86 @@ function ColorPriority(priority) {
   }
 }
 
-showAllTasks();
-
-
 function initButtons() {
   const edits = document.querySelectorAll('.divTaskEdit')
   edits.forEach((button, index) => {
     button.addEventListener('click', () => {
       dialogTask.showModal();
-      document.getElementById('taskName').value = Tasks[index].name;
-      document.getElementById('taskDesc').value = Tasks[index].desc;
-      document.getElementById('taskDate').value = Tasks[index].date;
-      document.getElementById('taskPriority').value = Tasks[index].priority;
-      document.getElementById('taskProjects').value = Tasks[index].project;
+      modalName.value = Tasks[index].name;
+      modalDesc.value = Tasks[index].desc;
+      modalDate.value = Tasks[index].date;
+      modalPrior.value = Tasks[index].priority;
+      modalProj.value = Tasks[index].project;
       currentAction = index;
-
     })
   });
 
   const deletes = document.querySelectorAll('.divTaskDel')
   deletes.forEach((button, index) => {
-    button.addEventListener('click', () =>{
-      Tasks.splice(index,1);
+    button.addEventListener('click', () => {
+      Tasks.splice(index, 1);
       saveState(Tasks);
       showAllTasks();
     })
   });
 }
 
+/*----------------------------------Calendar---------------------------------------*/
+const CalendarButton = document.getElementById('CalendarTask');
+
+CalendarButton.addEventListener('click', initCalendar);
+
+function initCalendar() {
+  let calendarFlow = document.createElement('div');
+  calendarFlow.classList.add('calendarFlow');
+  main.innerHTML = '';
+  main.appendChild(calendarFlow);
+  calendarFlow.innerHTML = `
+    <div class='calendarButtons'>
+      <button class='prevWeek'>Previous week</button>
+      <p class='currentWeek'>12123</p>
+      <button class='nextWeek'>Next week</button>
+    </div>
+    <div class='calendarTask'></div>
+    `;
+  let calendar = document.querySelector('.calendarTask')
+  let timeZone = [];
+  for (i = 0; i < 192; i++) {
+    if (i % 8 == 0) {
+      timeZone.push(`${i / 8}:00`)
+    } else {
+      timeZone.push('')
+    }
+  }
+  calendar.innerHTML = `
+    <div class="calendar-header"></div>
+    <div class="calendar-header">Пн</div>
+    <div class="calendar-header">Вт</div>
+    <div class="calendar-header">Ср</div>
+    <div class="calendar-header">Чт</div>
+    <div class="calendar-header">Пт</div>
+    <div class="calendar-header">Сб</div>
+    <div class="calendar-header">Вс</div>`
+  calendar.innerHTML += timeZone.map(time => `
+    <div class="calendar-day">${time}</div>
+    `).join('');
+}
 
 
 
 
 
-
-
-
+initCalendar()
 //загружать project в add из сущ проject
+
+//сделать слева время в строке, сверху дату
+
+/*
+      <div class="calendar-header"></div>
+      <div class="calendar-header">Пн</div>
+      <div class="calendar-header">Вт</div>
+      <div class="calendar-header">Ср</div>
+      <div class="calendar-header">Чт</div>
+      <div class="calendar-header">Пт</div>
+      <div class="calendar-header">Сб</div>
+      <div class="calendar-header">Вс</div>*/
