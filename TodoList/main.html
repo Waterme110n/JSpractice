@@ -210,7 +210,7 @@
       justify-content: space-around;
     }
 
-    .divTasks .divTaskCard {
+    .divTaskCard {
       position: relative;
       display: flex;
       flex-direction: column;
@@ -408,14 +408,15 @@
     }
 
     /*----------------------------------Search---------------------------------------*/
-    .search-container {
-      padding: 16px 20px;
-      background: linear-gradient(135deg, var(--main-color), #f9ecec);
-      border-bottom: 1px solid var(--secondary-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    .searchFlow {
+      display: flex;
+      flex-direction: column;
+      gap: 20px
+    }
+    .resultQuery{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
     }
 
     .search-box {
@@ -482,6 +483,7 @@
       content: "🔍";
       font-size: 1.1rem;
     }
+
 
   </style>
 </head>

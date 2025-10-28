@@ -1,27 +1,37 @@
 let jsonTasks = '';
 let Tasks = [];
+let taskIdCounter = 0;
 
 function Task(name, desc, date, priority, project) {
-  this.name = name,
-    this.desc = desc,
-    this.date = date,
-    this.priority = priority,
-    this.project = project
+  this.id = taskIdCounter++;
+  this.name = name;
+  this.desc = desc;
+  this.date = date;
+  this.priority = priority;
+  this.project = project;
 }
 
 function loadState() {
   const savedState = localStorage.getItem('Tasks');
+  const savedCounter = localStorage.getItem('taskIdCounter')
   Tasks = savedState ? JSON.parse(savedState) : [];
+  if (Tasks.length > 0) {
+    const maxId = Math.max(...Tasks.map(t => t.id || 0));
+    taskIdCounter = maxId + 1;
+  } else if (savedCounter) {
+    taskIdCounter = parseInt(savedCounter);
+  }
   console.log(Tasks);
 }
 
 function saveState(Tasks) {
   jsonTasks = JSON.stringify(Tasks);
   localStorage.setItem('Tasks', jsonTasks);
+  localStorage.setItem('taskIdCounter', taskIdCounter)
 }
 
 
-loadState()
+loadState();
 
 /*----------------------------------СreateTask---------------------------------------*/
 const createTask = document.getElementById('createTask');
@@ -34,7 +44,7 @@ const modalDate = document.getElementById('taskDate')
 const modalPrior = document.getElementById('taskPriority')
 const modalProj = document.getElementById('taskProjects')
 
-let currentAction = -1;
+let currentAction = 0;
 
 createTask.addEventListener('click', function () {
   modalName.value = '';
@@ -51,12 +61,18 @@ dialogTaskCancelButton.addEventListener('click', function () {
 })
 
 dialogTask.addEventListener('submit', function (event) {
+  let editableTask = Tasks.find(task => task.id == currentAction)
   event.preventDefault();
   if (currentAction == -1) {
     Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value));
-  } else {
-    Tasks[currentAction] = new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value)
+  } else if (editableTask) {
+    editableTask.name = modalName.value;
+    editableTask.desc = modalDesc.value;
+    editableTask.date = modalDate.value;
+    editableTask.priority = modalPrior.value;
+    editableTask.project = modalProj.value;
   }
+
   saveState(Tasks);
 
   switch (where) {
@@ -68,6 +84,9 @@ dialogTask.addEventListener('submit', function (event) {
       initCalendar();
       break;
     }
+    case 'Search': {
+      initSearch()
+    }
   }
 
   dialogTask.close();
@@ -78,21 +97,27 @@ dialogTask.addEventListener('submit', function (event) {
 const allTaskButton = document.getElementById('allTask');
 const main = document.querySelector('.main');
 let where = '';
-allTaskButton.addEventListener('click',() => {
-  showAllTasks()
-} );
 
-function showAllTasks() {
+allTaskButton.addEventListener('click', () => {
+  showAllTasks()
+});
+
+function showAllTasks(Taskes = Tasks) {
   where = 'Task';
   let divTasks = document.createElement('div');
   divTasks.classList.add('divTasks');
   main.innerHTML = '';
   main.appendChild(divTasks);
-  if (Tasks.length == 0) {
-    divTasks.innerHTML = 'Create Any Task'
+
+  drawCards(Taskes, divTasks)
+}
+
+function drawCards(Taskes = Tasks, divTasks) {
+  if (Taskes.length == 0) {
+    divTasks.innerHTML = 'No tasks'
   } else {
-    divTasks.innerHTML = Tasks.map(task => `
-      <div class="divTaskCard">
+    divTasks.innerHTML = Taskes.map(task => `
+      <div class="divTaskCard" id="${task.id}">
         <h2>${task.name}</h2>
         <p class="divTaskDesc">${task.desc}</p>
         <p class="divTaskdate">${task.date.slice(0, 10)}</p>
@@ -106,7 +131,7 @@ function showAllTasks() {
     `
     ).join('')
   }
-  initTaskButtons();
+  initTaskButtons(Taskes);
 }
 
 function ColorPriority(priority) {
@@ -130,25 +155,31 @@ function ColorPriority(priority) {
   }
 }
 
-function initTaskButtons() {
+function initTaskButtons(Taskes) {
   const edits = document.querySelectorAll('.divTaskEdit')
+
   edits.forEach((button, index) => {
+    let editsPar = button.parentElement;
+    let ButtonsPar = editsPar.parentElement;
     button.addEventListener('click', () => {
       dialogTask.showModal();
-      modalName.value = Tasks[index].name;
-      modalDesc.value = Tasks[index].desc;
-      modalDate.value = Tasks[index].date;
-      modalPrior.value = Tasks[index].priority;
-      modalProj.value = Tasks[index].project;
-      currentAction = index;
-
+      modalName.value = Taskes[index].name;
+      modalDesc.value = Taskes[index].desc;
+      modalDate.value = Taskes[index].date;
+      modalPrior.value = Taskes[index].priority;
+      modalProj.value = Taskes[index].project;
+      currentAction = ButtonsPar.id;
+      console.log(currentAction)
     })
   });
 
   const deletes = document.querySelectorAll('.divTaskDel')
-  deletes.forEach((button, index) => {
+  deletes.forEach((button) => {
     button.addEventListener('click', () => {
-      Tasks.splice(index, 1);
+      let editsPar = button.parentElement;
+      let ButtonsPar = editsPar.parentElement;
+      let curInTrueArr = parseInt(ButtonsPar.id);
+      Tasks = Tasks.filter(item => item.id !== curInTrueArr);
       saveState(Tasks);
       showAllTasks();
     })
@@ -285,7 +316,7 @@ function insertIntoSells(timeZone) {
 
 function placeTaskIntoSell(task, positionCell) {
   let calendarDays = document.querySelectorAll('.calendar-day');
-  let numberTask = Tasks.indexOf(task);
+  let numberTask = task.id;
   calendarDays[positionCell].innerHTML += `
   <div class = 'calendarTaskInCell' id='${numberTask}task' style="background-color: ${ColorPriority(task.priority)}">
     <p class = 'nameTaskInCell'>${task.name}</p>
@@ -296,12 +327,15 @@ function placeTaskIntoSell(task, positionCell) {
   let taskDivInCell = document.getElementById(`${numberTask}task`);
   taskDivInCell.addEventListener('click', () => {
     dialogTask.showModal();
-    modalName.value = Tasks[numberTask].name;
-    modalDesc.value = Tasks[numberTask].desc;
-    modalDate.value = Tasks[numberTask].date;
-    modalPrior.value = Tasks[numberTask].priority;
-    modalProj.value = Tasks[numberTask].project;
+    curTask = Tasks.find(task => task.id == numberTask)
+    console.log(curTask)
+    modalName.value = curTask.name;
+    modalDesc.value = curTask.desc;
+    modalDate.value = curTask.date;
+    modalPrior.value = curTask.priority;
+    modalProj.value = curTask.project;
     currentAction = numberTask;
+    console.log(currentAction)
   })
 
 }
@@ -313,9 +347,12 @@ SearchButton.addEventListener('click', () => {
   initSearch();
 });
 
+let queryDiv;
+
 function initSearch() {
+  where = 'Search';
   let search = document.createElement('div');
-  search.classList.add('.searchFlow')
+  search.classList.add('searchFlow');
   main.innerHTML = '';
   main.appendChild(search);
   search.innerHTML = `
@@ -324,26 +361,38 @@ function initSearch() {
       <button class="dismissSearch"></button>
       <butoon class="acceptSearch"></button>
     </div>
-    `
-    initSearchButtons();
+    <div class = "resultQuery"></div>
+    `;
+  queryDiv = document.querySelector('.resultQuery');
+  initSearchButtons();
 }
 
-function initSearchButtons(){
-    const dismissSearch = document.querySelector('.dismissSearch');
-    const taskSearch = document.querySelector('.taskSearch')
-    dismissSearch.addEventListener('click',() =>{
-      taskSearch.value = '';
-    })
-    const acceptSearch = document.querySelector('.acceptSearch');
-    acceptSearch.addEventListener('click', () => {
-      let insertText = taskSearch.value
-      searchTask(insertText);
-    })
+
+function initSearchButtons() {
+  const dismissSearch = document.querySelector('.dismissSearch');
+  const taskSearch = document.querySelector('.taskSearch')
+  dismissSearch.addEventListener('click', () => {
+    taskSearch.value = '';
+    queryDiv.innerHTML = '';
+
+  })
+  const acceptSearch = document.querySelector('.acceptSearch');
+  acceptSearch.addEventListener('click', () => {
+    let insertText = taskSearch.value
+    searchTask(insertText);
+  })
 }
 
-function searchTask(query){
-  
-
+function searchTask(query) {
+  let queryArr = [];
+  for (let task of Tasks) {
+    for (let key in task) {
+      if (task[key].toString().toLowerCase().includes(query.toLowerCase())) {
+        !queryArr.includes(task) ? queryArr.push(task) : '';
+        drawCards(queryArr, queryDiv)
+      }
+    }
+  }
 }
 
 initSearch();
@@ -358,5 +407,6 @@ initSearch();
 
 
 
-//поиск
+//поиск надо получать выборку исходя из запроса и по этой
+// выборке уже сверху работать беря id и работать с настоящим массивом по этому id
 //листы загружать project в add из сущ проject
