@@ -55,10 +55,21 @@ dialogTask.addEventListener('submit', function (event) {
   if (currentAction == -1) {
     Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value));
   } else {
-    Tasks[currentAction] = new Task()
+    Tasks[currentAction] = new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value)
   }
   saveState(Tasks);
-  showAllTasks();
+
+  switch (where) {
+    case 'Task': {
+      showAllTasks();
+      break;
+    }
+    case 'Calendar': {
+      initCalendar();
+      break;
+    }
+  }
+
   dialogTask.close();
 
 })
@@ -66,10 +77,11 @@ dialogTask.addEventListener('submit', function (event) {
 /*----------------------------------All Task---------------------------------------*/
 const allTaskButton = document.getElementById('allTask');
 const main = document.querySelector('.main');
-
+let where = '';
 allTaskButton.addEventListener('click', showAllTasks);
 
 function showAllTasks() {
+  where = 'Task';
   let divTasks = document.createElement('div');
   divTasks.classList.add('divTasks');
   main.innerHTML = '';
@@ -127,6 +139,7 @@ function initButtons() {
       modalPrior.value = Tasks[index].priority;
       modalProj.value = Tasks[index].project;
       currentAction = index;
+
     })
   });
 
@@ -151,6 +164,8 @@ CalendarButton.addEventListener('click', () => {
 });
 
 function initCalendar() {
+  where = 'Calendar';
+  console.log(where)
   let calendarFlow = document.createElement('div');
   calendarFlow.classList.add('calendarFlow');
   main.innerHTML = '';
@@ -251,15 +266,14 @@ function insertIntoSells(timeZone) {
       month: task.date.toString().slice(5, 7)
     }
     let positionCell = 0;
-    console.log(cell)
     for (let dayWeek of week) {
       if (dayWeek.month + 1 == cell.month) {
         if (dayWeek.date == cell.day) {
           positionCell += week.indexOf(dayWeek) + 1;
           timeZone.forEach(item => {
-            if (item.split(':')[0] == (cell.time[0] == 0 ? cell.time.slice(1,2): cell.time)) {
+            if (item.split(':')[0] == (cell.time[0] == 0 ? cell.time.slice(1, 2) : cell.time)) {
               positionCell += timeZone.indexOf(item);
-              placeTaskIntoSell(task,positionCell)
+              placeTaskIntoSell(task, positionCell)
             }
           })
         }
@@ -268,16 +282,30 @@ function insertIntoSells(timeZone) {
   }
 }
 
-function placeTaskIntoSell(task,positionCell){
-  let calendarDays = document.querySelectorAll('.calendar-day')
+function placeTaskIntoSell(task, positionCell) {
+  let calendarDays = document.querySelectorAll('.calendar-day');
+  let numberTask = Tasks.indexOf(task);
   calendarDays[positionCell].innerHTML += `
-  <div class = 'calendarTaskInCell' style="background-color: ${ColorPriority(task.priority)}">
+  <div class = 'calendarTaskInCell' id='${numberTask}task' style="background-color: ${ColorPriority(task.priority)}">
     <p class = 'nameTaskInCell'>${task.name}</p>
     <p class = 'descTaskInCell'>${task.desc}</p>
   </div>
   `
 
+  let taskDivInCell = document.getElementById(`${numberTask}task`);
+  taskDivInCell.addEventListener('click', () => {
+    dialogTask.showModal();
+    modalName.value = Tasks[numberTask].name;
+    modalDesc.value = Tasks[numberTask].desc;
+    modalDate.value = Tasks[numberTask].date;
+    modalPrior.value = Tasks[numberTask].priority;
+    modalProj.value = Tasks[numberTask].project;
+    currentAction = numberTask;
+  })
+
 }
+
+
 
 initCalendar();
 //сделать по времени показ в какой клетке какая таска, при нажатии либо создавать новую изменять старую
