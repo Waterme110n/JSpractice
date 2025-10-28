@@ -370,6 +370,42 @@
       text-align: center;
     }
 
+    .calendarTaskInCell {
+    font-family: var(--font);
+    background-color: var(--main-color);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--secondary-color);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .calendarTaskInCell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--third-color);
+  }
+
+  .nameTaskInCell {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--fourth-color);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .descTaskInCell {
+    font-size: 0.8rem;
+    color: var(--third-color);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   </style>
 </head>
 
@@ -382,7 +418,6 @@
         <li><button id="createTask">Create</button></li>
         <li><button id="allTask">All</button></li>
         <li><button id="CalendarTask">Calendar</button></li>
-        <li><button id="filters">Filters</button></li>
       </ul>
     </div>
     <div class="lists">

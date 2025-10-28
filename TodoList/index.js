@@ -82,7 +82,7 @@ function showAllTasks() {
         <h2>${task.name}</h2>
         <p class="divTaskDesc">${task.desc}</p>
         <p class="divTaskdate">${task.date.slice(0, 10)}</p>
-        <p class="divTaskPrior" style="${ColorPriority(task.priority)}">${task.priority}</p>
+        <p class="divTaskPrior" style="color : ${ColorPriority(task.priority)}">${task.priority}</p>
         <p class="divTaskProj">${task.project}</p>
         <div class="TaskCardActions">
           <button class="divTaskEdit"></button>
@@ -96,18 +96,18 @@ function showAllTasks() {
 }
 
 function ColorPriority(priority) {
-  let color = 'color : #dfd3d3;'
+  let color = '#dfd3d3;'
   switch (priority) {
     case 'Very Important': {
-      color = 'color : #ce0000;';
+      color = '#ce0000;';
       return color;
     }
     case 'Important': {
-      color = 'color : #792e2e;';
+      color = '#792e2e;';
       return color;
     }
     case 'Common': {
-      color = 'color : #d6aaaa;';
+      color = '#d6aaaa;';
       return color;
     }
     case 'UnImportant': {
@@ -182,13 +182,15 @@ function addDateCalendar(calendar) {
     `).join('')
 }
 
+let week = [];
+
 function daysInWeeks(today) {
   const currentDate = new Date(today);
   const dayOfWeek = currentDate.getDay();
   const daysToMon = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   currentDate.setDate(currentDate.getDate() - daysToMon);
 
-  let week = [];
+  week = [];
   let weekText = [];
 
   for (i = 0; i < 7; i++) {
@@ -197,10 +199,12 @@ function daysInWeeks(today) {
 
     week.push({
       day: date.toString().slice(0, 3),
-      date: date.toString().slice(8, 10)
+      date: date.toString().slice(8, 10),
+      month: date.getMonth()
     })
+
     if (i == 0 || i == 6) {
-      weekText.push(date.toString().slice(4,10))
+      weekText.push(date.toString().slice(4, 10))
     }
   }
 
@@ -223,6 +227,9 @@ function addCellWithTime(calendar) {
   calendar.innerHTML += timeZone.map(time => `
     <div class="calendar-day">${time}</div>
     `).join('');
+
+  insertIntoSells(timeZone);
+
 }
 
 function AddWeekListeners(prev, next) {
@@ -236,19 +243,43 @@ function AddWeekListeners(prev, next) {
   })
 }
 
+function insertIntoSells(timeZone) {
+  for (let task of Tasks) {
+    let cell = {
+      time: task.date.slice(11, 13),
+      day: task.date.toString().slice(8, 10),
+      month: task.date.toString().slice(5, 7)
+    }
+    let positionCell = 0;
+    console.log(cell)
+    for (let dayWeek of week) {
+      if (dayWeek.month + 1 == cell.month) {
+        if (dayWeek.date == cell.day) {
+          positionCell += week.indexOf(dayWeek) + 1;
+          timeZone.forEach(item => {
+            if (item.split(':')[0] == (cell.time[0] == 0 ? cell.time.slice(1,2): cell.time)) {
+              positionCell += timeZone.indexOf(item);
+              placeTaskIntoSell(task,positionCell)
+            }
+          })
+        }
+      }
+    }
+  }
+}
 
+function placeTaskIntoSell(task,positionCell){
+  let calendarDays = document.querySelectorAll('.calendar-day')
+  calendarDays[positionCell].innerHTML += `
+  <div class = 'calendarTaskInCell' style="background-color: ${ColorPriority(task.priority)}">
+    <p class = 'nameTaskInCell'>${task.name}</p>
+    <p class = 'descTaskInCell'>${task.desc}</p>
+  </div>
+  `
 
-initCalendar()
-//загружать project в add из сущ проject
+}
 
-//сделать слева время в строке, сверху дату
-
-/*
-      <div class="calendar-header"></div>
-      <div class="calendar-header">Пн</div>
-      <div class="calendar-header">Вт</div>
-      <div class="calendar-header">Ср</div>
-      <div class="calendar-header">Чт</div>
-      <div class="calendar-header">Пт</div>
-      <div class="calendar-header">Сб</div>
-      <div class="calendar-header">Вс</div>*/
+initCalendar();
+//сделать по времени показ в какой клетке какая таска, при нажатии либо создавать новую изменять старую
+//поиск
+//листы загружать project в add из сущ проject
