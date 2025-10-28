@@ -78,7 +78,9 @@ dialogTask.addEventListener('submit', function (event) {
 const allTaskButton = document.getElementById('allTask');
 const main = document.querySelector('.main');
 let where = '';
-allTaskButton.addEventListener('click', showAllTasks);
+allTaskButton.addEventListener('click',() => {
+  showAllTasks()
+} );
 
 function showAllTasks() {
   where = 'Task';
@@ -104,7 +106,7 @@ function showAllTasks() {
     `
     ).join('')
   }
-  initButtons();
+  initTaskButtons();
 }
 
 function ColorPriority(priority) {
@@ -128,7 +130,7 @@ function ColorPriority(priority) {
   }
 }
 
-function initButtons() {
+function initTaskButtons() {
   const edits = document.querySelectorAll('.divTaskEdit')
   edits.forEach((button, index) => {
     button.addEventListener('click', () => {
@@ -165,7 +167,6 @@ CalendarButton.addEventListener('click', () => {
 
 function initCalendar() {
   where = 'Calendar';
-  console.log(where)
   let calendarFlow = document.createElement('div');
   calendarFlow.classList.add('calendarFlow');
   main.innerHTML = '';
@@ -305,9 +306,57 @@ function placeTaskIntoSell(task, positionCell) {
 
 }
 
+/*----------------------------------Search---------------------------------------*/
+const SearchButton = document.getElementById('searchTask');
+
+SearchButton.addEventListener('click', () => {
+  initSearch();
+});
+
+function initSearch() {
+  let search = document.createElement('div');
+  search.classList.add('.searchFlow')
+  main.innerHTML = '';
+  main.appendChild(search);
+  search.innerHTML = `
+    <div class="search-box">
+      <input type="text" class="taskSearch" placeholder="Search something..." />
+      <button class="dismissSearch"></button>
+      <butoon class="acceptSearch"></button>
+    </div>
+    `
+    initSearchButtons();
+}
+
+function initSearchButtons(){
+    const dismissSearch = document.querySelector('.dismissSearch');
+    const taskSearch = document.querySelector('.taskSearch')
+    dismissSearch.addEventListener('click',() =>{
+      taskSearch.value = '';
+    })
+    const acceptSearch = document.querySelector('.acceptSearch');
+    acceptSearch.addEventListener('click', () => {
+      let insertText = taskSearch.value
+      searchTask(insertText);
+    })
+}
+
+function searchTask(query){
+  
+
+}
+
+initSearch();
 
 
-initCalendar();
-//сделать по времени показ в какой клетке какая таска, при нажатии либо создавать новую изменять старую
+
+
+
+
+
+
+
+
+
 //поиск
 //листы загружать project в add из сущ проject
