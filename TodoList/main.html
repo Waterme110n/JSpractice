@@ -211,6 +211,39 @@
       background-color: #5a5353;
     }
 
+    .checkboxProjects {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--third-color);
+      border-radius: 5px;
+      background-color: var(--secondary-color);
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .checkboxProjects .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      color: var(--fourth-color);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkboxProjects .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--fourth-color);
+      cursor: pointer;
+    }
+
+    .checkboxProjects .checkbox-label span {
+      font-family: var(--font);
+    }
+
     /*--------------------------------All Tasks----------------------------------------*/
 
     .divTasks {
@@ -264,6 +297,8 @@
     }
 
     .divTaskPrior {
+      display: flex;
+      flex-direction: column;
       position: absolute;
       top: 10px;
       right: 20px;
@@ -581,7 +616,7 @@
       overflow-y: auto;
     }
 
-    .checkbox-label {
+    .checkbox-group .checkbox-label {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -591,14 +626,14 @@
       user-select: none;
     }
 
-    .checkbox-label input[type="checkbox"] {
+    .checkbox-group .checkbox-label input[type="checkbox"] {
       width: 18px;
       height: 18px;
       accent-color: var(--fourth-color);
       cursor: pointer;
     }
 
-    .checkbox-label span {
+    .checkbox-group .checkbox-label span {
       font-family: var(--font);
     }
   </style>
@@ -641,10 +676,8 @@
           <option value="Important">Important</option>
           <option value="Very Important">Very Important</option>
         </select>
-        <select id="taskProjects">
-          <option value="" disabled selected>Choose project</option>
-          <option value="project1">Project 1</option>
-        </select>
+      </div>
+      <div class="checkboxProjects" id="taskProjects">
       </div>
       <div class="form-buttons">
         <button type="button" class="cancel-btn">Cancel</button>

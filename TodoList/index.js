@@ -6,13 +6,13 @@ let jsonLists = '';
 let Lists = [];
 let listCounter = 0;
 
-function Task(name, desc, date, priority, project) {
+function Task(name, desc, date, priority, projects) {
   this.id = taskIdCounter++;
   this.name = name;
   this.desc = desc;
   this.date = date;
   this.priority = priority;
-  this.project = project;
+  this.projects = projects;
 }
 
 function loadState() {
@@ -32,8 +32,8 @@ function loadState() {
   const savedListCounter = localStorage.getItem('listCounter');
   Lists = savedLists ? JSON.parse(savedLists) : [];
   if (Lists.length > 0) {
-    const maxId = Math.max(...Tasks.map(t => t.id || 0));
-    listCounter = maxId + 1;
+    const maxedId = Math.max(...Lists.map(l => l.id || 0));
+    listCounter = maxedId + 1;
   } else if (savedListCounter) {
     listCounter = parseInt(savedListCounter);
   }
@@ -54,7 +54,7 @@ function saveStateList(Lists) {
 }
 
 loadState();
-
+  
 /*----------------------------------СreateTask---------------------------------------*/
 const createTask = document.getElementById('createTask');
 const dialogTask = document.getElementById('createWindowTask');
@@ -73,7 +73,11 @@ createTask.addEventListener('click', function () {
   modalDesc.value = '';
   modalDate.value = '';
   modalPrior.value = 'UnImportant';
-  modalProj.value = '';
+  modalProj.innerHTML = Lists.map(list => `
+  <label class="checkbox-label">
+    <input type="checkbox" name="projects" value="project${list.id}">
+    <span>${list.name}</span>
+  </label> `).join('');
   currentAction = -1;
   dialogTask.showModal();
 })
@@ -83,16 +87,22 @@ dialogTaskCancelButton.addEventListener('click', function () {
 })
 
 dialogTask.addEventListener('submit', function (event) {
-  let editableTask = Tasks.find(task => task.id == currentAction)
+  let editableTask = Tasks.find(task => task.id == currentAction);
+  let checked = document.querySelectorAll('input[name="projects"]:checked')
+  let checkedArr = Array.from(checked).map(div => {
+    return div.value.toString().slice(7)
+  });
+  let checkedPar = document.querySelectorAll('.checkbox-label')
+  checkedPar.innerHTML = '';
   event.preventDefault();
   if (currentAction == -1) {
-    Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value));
+    Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, checkedArr));
   } else if (editableTask) {
     editableTask.name = modalName.value;
     editableTask.desc = modalDesc.value;
     editableTask.date = modalDate.value;
     editableTask.priority = modalPrior.value;
-    editableTask.project = modalProj.value;
+    editableTask.projects = checkedArr;
   }
 
   saveStateTask(Tasks);
@@ -147,7 +157,13 @@ function drawCards(Taskes = Tasks, divTasks) {
         <p class="divTaskDesc">${task.desc}</p>
         <p class="divTaskdate">${task.date.slice(0, 10)}</p>
         <p class="divTaskPrior" style="color : ${ColorPriority(task.priority)}">${task.priority}</p>
-        <p class="divTaskProj">${task.project}</p>
+        <div class='divTaskProj'>
+        ${task.projects.length == 0 ?
+        `<p class="divTaskProj">none projects</p>` :
+        task.projects.map(proj => {
+          return `<p class="divTaskProj">${Lists.find(el => el.id == Number(proj)).name}</p> `
+        }).join('')}
+        </div>
         <div class="TaskCardActions">
           <button class="divTaskEdit"></button>
           <button class="divTaskDel"></button>
@@ -192,9 +208,13 @@ function initTaskButtons(Taskes) {
       modalDesc.value = Taskes[index].desc;
       modalDate.value = Taskes[index].date;
       modalPrior.value = Taskes[index].priority;
-      modalProj.value = Taskes[index].project;
+      console.log(Taskes[index])
+      modalProj.innerHTML = Taskes[index].projects.length == 0 ?
+        `<p class="divTaskProj">None projects</p> `
+        : Taskes[index].projects.map(proj =>
+          `<p class="divTaskProj">${Lists.find(el => el.id == Number(proj)).name}</p> `
+        ).join('')
       currentAction = ButtonsPar.id;
-      console.log(currentAction)
     })
   });
 
@@ -241,7 +261,7 @@ function initCalendar() {
   calendarFlow.innerHTML = `
     <div class='calendarButtons'>
       <button class='prevWeek'>Previous week</button>
-      <p class='currentWeek'>12123</p>
+      <p class='currentWeek'></p>
       <button class='nextWeek'>Next week</button>
     </div>
     <div class='calendarTask'></div>
@@ -364,18 +384,19 @@ function placeTaskIntoSell(task, positionCell) {
   taskDivInCell.addEventListener('click', () => {
     dialogTask.showModal();
     curTask = Tasks.find(task => task.id == numberTask)
-    console.log(curTask)
     modalName.value = curTask.name;
     modalDesc.value = curTask.desc;
     modalDate.value = curTask.date;
     modalPrior.value = curTask.priority;
-    modalProj.value = curTask.project;
+    modalProj.innerHTML = curTask.projects.length == 0 ?
+      `<p class="divTaskProj">None projects</p> `
+      : curTask.projects.map(proj =>
+        `<p class="divTaskProj">${proj.name}</p> `
+      ).join('');
     currentAction = numberTask;
-    console.log(currentAction)
   })
 
 }
-
 /*----------------------------------Search---------------------------------------*/
 const SearchButton = document.getElementById('searchTask');
 
@@ -431,8 +452,6 @@ function searchTask(query) {
   }
 }
 
-//листы загружать project в add из сущ проject
-
 /*----------------------------------Lists---------------------------------------*/
 
 function List(name, tasksId = []) {
@@ -463,15 +482,34 @@ dialogListCancelButton.addEventListener('click', () => {
   dialogList.close();
 })
 
-dialogList.addEventListener('submit', function(event){
+dialogList.addEventListener('submit', function (event) {
   let checked = document.querySelectorAll('input[name="projects"]:checked')
   let checkedArr = Array.from(checked).map(div => {
     return div.value.toString().slice(7)
   });
-  Lists.push(new List(modalListName.value,checkedArr));
+  const newList = new List(modalListName.value, checkedArr);
+  Lists.push(newList)
   saveStateList(Lists);
-  console.log(Lists)
+
+  checkedArr.forEach(taskIdStr => {
+    const taskId = Number(taskIdStr);
+    const task = Tasks.find(t => t.id === taskId);
+
+    if (task) {
+      const listIdStr = String(newList.id);
+
+      if (!task.projects.includes(listIdStr)) {
+
+        task.projects.push(listIdStr);
+      }
+    }
+  });
+
+  saveStateTask(Tasks);
+  dialogList.close();
 })
 
 
+//добавить обновление экрана когда был создан проект
+//изменять листы прямо в тасках(необяз)
 
