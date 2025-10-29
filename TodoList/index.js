@@ -2,6 +2,10 @@ let jsonTasks = '';
 let Tasks = [];
 let taskIdCounter = 0;
 
+let jsonLists = '';
+let Lists = [];
+let listCounter = 0;
+
 function Task(name, desc, date, priority, project) {
   this.id = taskIdCounter++;
   this.name = name;
@@ -13,7 +17,7 @@ function Task(name, desc, date, priority, project) {
 
 function loadState() {
   const savedState = localStorage.getItem('Tasks');
-  const savedCounter = localStorage.getItem('taskIdCounter')
+  const savedCounter = localStorage.getItem('taskIdCounter');
   Tasks = savedState ? JSON.parse(savedState) : [];
   if (Tasks.length > 0) {
     const maxId = Math.max(...Tasks.map(t => t.id || 0));
@@ -21,15 +25,33 @@ function loadState() {
   } else if (savedCounter) {
     taskIdCounter = parseInt(savedCounter);
   }
+
   console.log(Tasks);
+
+  const savedLists = localStorage.getItem('Lists');
+  const savedListCounter = localStorage.getItem('listCounter');
+  Lists = savedLists ? JSON.parse(savedLists) : [];
+  if (Lists.length > 0) {
+    const maxId = Math.max(...Tasks.map(t => t.id || 0));
+    listCounter = maxId + 1;
+  } else if (savedListCounter) {
+    listCounter = parseInt(savedListCounter);
+  }
+
+  console.log(Lists);
 }
 
-function saveState(Tasks) {
+function saveStateTask(Tasks) {
   jsonTasks = JSON.stringify(Tasks);
   localStorage.setItem('Tasks', jsonTasks);
   localStorage.setItem('taskIdCounter', taskIdCounter)
 }
 
+function saveStateList(Lists) {
+  jsonLists = JSON.stringify(Lists);
+  localStorage.setItem('Lists', jsonLists);
+  localStorage.setItem('listCounter', listCounter)
+}
 
 loadState();
 
@@ -73,7 +95,7 @@ dialogTask.addEventListener('submit', function (event) {
     editableTask.project = modalProj.value;
   }
 
-  saveState(Tasks);
+  saveStateTask(Tasks);
 
   switch (where) {
     case 'Task': {
@@ -183,7 +205,7 @@ function initTaskButtons(Taskes) {
       let ButtonsPar = editsPar.parentElement;
       let curInTrueArr = parseInt(ButtonsPar.id);
       Tasks = Tasks.filter(item => item.id !== curInTrueArr);
-      saveState(Tasks);
+      saveStateTask(Tasks);
       switch (where) {
         case 'Task': {
           showAllTasks();
@@ -409,6 +431,47 @@ function searchTask(query) {
   }
 }
 
-initSearch();
-
 //листы загружать project в add из сущ проject
+
+/*----------------------------------Lists---------------------------------------*/
+
+function List(name, tasksId = []) {
+  this.id = listCounter++;
+  this.name = name;
+  this.tasksId = tasksId;
+}
+
+
+const addListButton = document.querySelector('.addList');
+const dialogList = document.getElementById('createListWindow');
+const dialogListCancelButton = document.querySelector('.cancelList');
+
+const modalListName = document.getElementById('listName')
+const modaListTasks = document.getElementById('ListProjects')
+
+addListButton.addEventListener('click', () => {
+  modaListTasks.innerHTML = Tasks.map(task => `
+      <label class="checkbox-label">
+        <input type="checkbox" name="projects" value="project${task.id}">
+        <span>${task.name}</span>
+      </label>
+    `).join('');
+  dialogList.showModal();
+})
+
+dialogListCancelButton.addEventListener('click', () => {
+  dialogList.close();
+})
+
+dialogList.addEventListener('submit', function(event){
+  let checked = document.querySelectorAll('input[name="projects"]:checked')
+  let checkedArr = Array.from(checked).map(div => {
+    return div.value.toString().slice(7)
+  });
+  Lists.push(new List(modalListName.value,checkedArr));
+  saveStateList(Lists);
+  console.log(Lists)
+})
+
+
+
