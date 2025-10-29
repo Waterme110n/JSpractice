@@ -636,6 +636,40 @@
     .checkbox-group .checkbox-label span {
       font-family: var(--font);
     }
+
+    .listsOfLists {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      list-style: none;
+    }
+
+    .listsOfLists li {
+      text-align: left;
+      height: auto;
+      line-height: 1;
+    }
+
+    .listsOfLists li button {
+      font-family: var(--font);
+      font-weight: lighter;
+      line-height: 1;
+      border: none;
+      border-radius: 3px;
+      text-align: left;
+      padding: 10px;
+      background-color: transparent;
+      width: 100%;
+      font-size: 20px;
+    }
+
+    .divList {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: auto;
+      padding: 10px;
+    }
   </style>
 </head>
 
@@ -655,9 +689,8 @@
         <h3>Lists</h3>
         <button class="addList">+</button>
       </div>
-      <div class="listsOfLists">
-
-      </div>
+      <ul class="listsOfLists">
+      </ul>
     </div>
   </aside>
   <div class="main">

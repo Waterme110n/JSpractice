@@ -39,6 +39,7 @@ function loadState() {
   }
 
   console.log(Lists);
+  insertListToleftPanel();
 }
 
 function saveStateTask(Tasks) {
@@ -54,7 +55,6 @@ function saveStateList(Lists) {
 }
 
 loadState();
-  
 /*----------------------------------СreateTask---------------------------------------*/
 const createTask = document.getElementById('createTask');
 const dialogTask = document.getElementById('createWindowTask');
@@ -88,13 +88,16 @@ dialogTaskCancelButton.addEventListener('click', function () {
 
 dialogTask.addEventListener('submit', function (event) {
   let editableTask = Tasks.find(task => task.id == currentAction);
+  
   let checked = document.querySelectorAll('input[name="projects"]:checked')
   let checkedArr = Array.from(checked).map(div => {
     return div.value.toString().slice(7)
   });
+
   let checkedPar = document.querySelectorAll('.checkbox-label')
   checkedPar.innerHTML = '';
-  event.preventDefault();
+
+  event.preventDefault(); 
   if (currentAction == -1) {
     Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, checkedArr));
   } else if (editableTask) {
@@ -102,7 +105,6 @@ dialogTask.addEventListener('submit', function (event) {
     editableTask.desc = modalDesc.value;
     editableTask.date = modalDate.value;
     editableTask.priority = modalPrior.value;
-    editableTask.projects = checkedArr;
   }
 
   saveStateTask(Tasks);
@@ -391,7 +393,7 @@ function placeTaskIntoSell(task, positionCell) {
     modalProj.innerHTML = curTask.projects.length == 0 ?
       `<p class="divTaskProj">None projects</p> `
       : curTask.projects.map(proj =>
-        `<p class="divTaskProj">${proj.name}</p> `
+        `<p class="divTaskProj">${Lists.find(el => el.id == Number(proj)).name}</p> `
       ).join('');
     currentAction = numberTask;
   })
@@ -507,9 +509,29 @@ dialogList.addEventListener('submit', function (event) {
 
   saveStateTask(Tasks);
   dialogList.close();
+  insertListToleftPanel();
 })
 
 
 //добавить обновление экрана когда был создан проект
 //изменять листы прямо в тасках(необяз)
 
+function insertListToleftPanel() {
+  const listOfLists = document.querySelector('.listsOfLists')
+  listOfLists.innerHTML = Lists.map(list => `<li>
+      <button class='listButton' id ='list${list.id}'>${list.name}</button>
+    </li>
+    `
+  ).join('')
+}
+
+function showList(List) {
+  let divList = document.createElement('div');
+  divList.classList.add('divList');
+  main.innerHTML = '';
+  main.appendChild(divList);
+
+  divList.innerHTML = `
+  <h3>${List.name}</h3>
+  `
+}
