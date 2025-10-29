@@ -210,7 +210,7 @@
       justify-content: space-around;
     }
 
-    .divTasks .divTaskCard {
+    .divTaskCard {
       position: relative;
       display: flex;
       flex-direction: column;
@@ -371,41 +371,120 @@
     }
 
     .calendarTaskInCell {
-    font-family: var(--font);
-    background-color: var(--main-color);
-    border-radius: 12px;
-    padding: 10px 12px;
-    margin: 4px;  
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--secondary-color);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-  }
+      font-family: var(--font);
+      background-color: var(--main-color);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin: 4px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--secondary-color);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
 
-  .calendarTaskInCell:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-color: var(--third-color);
-  }
+    .calendarTaskInCell:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-color: var(--third-color);
+    }
 
-  .nameTaskInCell {
-    font-weight: bold;
-    font-size: 0.95rem;
-    color: var(--fourth-color);
-    margin-bottom: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    .nameTaskInCell {
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: var(--fourth-color);
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .descTaskInCell {
-    font-size: 0.8rem;
-    color: var(--third-color);
-    line-height: 1.4;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    .descTaskInCell {
+      font-size: 0.8rem;
+      color: var(--third-color);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /*----------------------------------Search---------------------------------------*/
+    .searchFlow {
+      display: flex;
+      flex-direction: column;
+      gap: 20px
+    }
+    .resultQuery{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      max-width: 420px;
+      margin: 0 auto;
+      font-family: var(--font);
+      background-color: white;
+      border: 2px solid var(--secondary-color);
+      border-radius: 50px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .taskSearch {
+      width: 100%;
+      border-radius: 50px;
+      border: none;
+      padding: 12px 96px 12px 24px;
+      font-size: 1rem;
+    }
+
+    .taskSearch:focus {
+      outline: none;
+    }
+
+    .dismissSearch,
+    .acceptSearch {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-55%);
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+    }
+    
+
+    .dismissSearch {
+      right: 48px;
+    }
+
+    .acceptSearch {
+      right: 12px;
+    }
+
+    .dismissSearch::before {
+      content: "❌";
+      font-size: 1.1rem;
+    }
+
+    .acceptSearch::before {
+      content: "🔍";
+      font-size: 1.1rem;
+    }
+
+
   </style>
 </head>
 
@@ -428,6 +507,10 @@
     </div>
   </aside>
   <div class="main">
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
   </div>
   <dialog id="createWindowTask">
     <form method="dialog" class="task-form">
