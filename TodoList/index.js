@@ -85,7 +85,10 @@ dialogTask.addEventListener('submit', function (event) {
       break;
     }
     case 'Search': {
-      initSearch()
+      initSearch();
+      const taskSearch = document.querySelector('.taskSearch')
+      taskSearch.value = insertText;
+      searchTask(insertText);
     }
   }
 
@@ -181,7 +184,18 @@ function initTaskButtons(Taskes) {
       let curInTrueArr = parseInt(ButtonsPar.id);
       Tasks = Tasks.filter(item => item.id !== curInTrueArr);
       saveState(Tasks);
-      showAllTasks();
+      switch (where) {
+        case 'Task': {
+          showAllTasks();
+          break;
+        }
+        case 'Search': {
+          initSearch();
+          const taskSearch = document.querySelector('.taskSearch')
+          taskSearch.value = insertText;
+          searchTask(insertText);
+        }
+      }
     })
   });
 }
@@ -367,7 +381,7 @@ function initSearch() {
   initSearchButtons();
 }
 
-
+let insertText = '';
 function initSearchButtons() {
   const dismissSearch = document.querySelector('.dismissSearch');
   const taskSearch = document.querySelector('.taskSearch')
@@ -378,7 +392,7 @@ function initSearchButtons() {
   })
   const acceptSearch = document.querySelector('.acceptSearch');
   acceptSearch.addEventListener('click', () => {
-    let insertText = taskSearch.value
+    insertText = taskSearch.value
     searchTask(insertText);
   })
 }
@@ -397,16 +411,4 @@ function searchTask(query) {
 
 initSearch();
 
-
-
-
-
-
-
-
-
-
-
-//поиск надо получать выборку исходя из запроса и по этой
-// выборке уже сверху работать беря id и работать с настоящим массивом по этому id
 //листы загружать project в add из сущ проject
