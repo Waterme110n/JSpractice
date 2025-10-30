@@ -2,36 +2,75 @@ let jsonTasks = '';
 let Tasks = [];
 let taskIdCounter = 0;
 
-function Task(name, desc, date, priority, project) {
+let jsonLists = '';
+let Lists = [];
+let listCounter = 0;
+
+function Task(name, desc, date, priority, projects) {
   this.id = taskIdCounter++;
   this.name = name;
   this.desc = desc;
   this.date = date;
   this.priority = priority;
-  this.project = project;
+  this.projects = new Set(projects.map(id => Number(id)));
 }
 
 function loadState() {
-  const savedState = localStorage.getItem('Tasks');
-  const savedCounter = localStorage.getItem('taskIdCounter')
-  Tasks = savedState ? JSON.parse(savedState) : [];
-  if (Tasks.length > 0) {
-    const maxId = Math.max(...Tasks.map(t => t.id || 0));
-    taskIdCounter = maxId + 1;
-  } else if (savedCounter) {
-    taskIdCounter = parseInt(savedCounter);
+  const savedTasks = localStorage.getItem('Tasks');
+  const savedCounter = localStorage.getItem('taskIdCounter');
+
+  if (savedTasks) {
+    const parsed = JSON.parse(savedTasks);
+    Tasks = parsed.map(t => ({
+      ...t,
+      projects: new Set(Array.isArray(t.projects) ? t.projects : [])
+    }));
+  } else {
+    Tasks = [];
   }
-  console.log(Tasks);
+
+  taskIdCounter = Tasks.length > 0
+    ? Math.max(...Tasks.map(t => t.id || 0)) + 1
+    : (savedCounter ? parseInt(savedCounter) : 0);
+
+  const savedLists = localStorage.getItem('Lists');
+  if (savedLists) {
+    const parsed = JSON.parse(savedLists);
+    Lists = parsed.map(l => ({
+      ...l,
+      tasksId: new Set(Array.isArray(l.tasksId) ? l.tasksId : [])
+    }));
+  } else {
+    Lists = [];
+  }
+
+  listCounter = Lists.length > 0
+    ? Math.max(...Lists.map(l => l.id || 0)) + 1
+    : (localStorage.getItem('listCounter') ? parseInt(localStorage.getItem('listCounter')) : 0);
+
+  insertListToleftPanel();
 }
 
-function saveState(Tasks) {
-  jsonTasks = JSON.stringify(Tasks);
-  localStorage.setItem('Tasks', jsonTasks);
-  localStorage.setItem('taskIdCounter', taskIdCounter)
+function saveStateTask(Tasks) {
+  const tasksToSave = Tasks.map(task => ({
+    ...task,
+    projects: Array.from(task.projects)
+  }));
+  localStorage.setItem('Tasks', JSON.stringify(tasksToSave));
+  localStorage.setItem('taskIdCounter', taskIdCounter);
 }
 
+function saveStateList(Lists) {
+  const listsToSave = Lists.map(list => ({
+    ...list,
+    tasksId: Array.from(list.tasksId)
+  }));
+  localStorage.setItem('Lists', JSON.stringify(listsToSave));
+  localStorage.setItem('listCounter', listCounter);
+}
 
 loadState();
+//localStorage.clear()
 
 /*----------------------------------СreateTask---------------------------------------*/
 const createTask = document.getElementById('createTask');
@@ -51,7 +90,11 @@ createTask.addEventListener('click', function () {
   modalDesc.value = '';
   modalDate.value = '';
   modalPrior.value = 'UnImportant';
-  modalProj.value = '';
+  modalProj.innerHTML = Lists.map(list => `
+  <label class="checkbox-label">
+    <input type="checkbox" name="projects" value="project${list.id}">
+    <span>${list.name}</span>
+  </label> `).join('');
   currentAction = -1;
   dialogTask.showModal();
 })
@@ -61,41 +104,80 @@ dialogTaskCancelButton.addEventListener('click', function () {
 })
 
 dialogTask.addEventListener('submit', function (event) {
-  let editableTask = Tasks.find(task => task.id == currentAction)
   event.preventDefault();
-  if (currentAction == -1) {
-    Tasks.push(new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, modalProj.value));
-  } else if (editableTask) {
+
+  const checked = document.querySelectorAll('input[name="projects"]:checked');
+  const checkedArr = Array.from(checked).map(input => Number(input.value.slice(7)));
+
+  let newTask;
+
+  if (currentAction === -1) {
+    newTask = new Task(
+      modalName.value,
+      modalDesc.value,
+      modalDate.value,
+      modalPrior.value,
+      checkedArr
+    );
+    Tasks.push(newTask);
+
+    checkedArr.forEach(listId => {
+      const list = Lists.find(l => l.id === listId);
+      if (list && !list.tasksId.has(newTask.id)) {
+        list.tasksId.add(newTask.id);
+      }
+    });
+    saveStateList(Lists);
+
+  } else {
+    const editableTask = Tasks.find(t => t.id === currentAction);
+    if (!editableTask) return;
+
+
     editableTask.name = modalName.value;
     editableTask.desc = modalDesc.value;
     editableTask.date = modalDate.value;
     editableTask.priority = modalPrior.value;
-    editableTask.project = modalProj.value;
+    editableTask.projects = checkedArr;
+
+
+    const oldProjects = new Set(editableTask.projects);
+    editableTask.projects = new Set(checkedArr);
+
+    syncTaskWithLists(oldProjects, checkedArr, editableTask.id);
+    saveStateList(Lists);
   }
 
-  saveState(Tasks);
-
-  switch (where) {
-    case 'Task': {
-      showAllTasks();
-      break;
-    }
-    case 'Calendar': {
-      initCalendar();
-      break;
-    }
-    case 'Search': {
-      initSearch();
-      const taskSearch = document.querySelector('.taskSearch')
-      taskSearch.value = insertText;
-      searchTask(insertText);
-    }
-  }
-
+  saveStateTask(Tasks);
   dialogTask.close();
 
-})
+  switch (where) {
+    case 'Task': showAllTasks(); break;
+    case 'Calendar': initCalendar(); break;
+    case 'Search':
+      initSearch();
+      const searchInput = document.querySelector('.taskSearch');
+      if (searchInput) searchInput.value = insertText;
+      searchTask(insertText);
+      break;
+    default: showAllTasks();
+  }
+});
 
+function syncTaskWithLists(oldProjectsSet, newProjectIdsArray, taskId) {
+  Lists.forEach(list => {
+    const wasInList = oldProjectsSet.has(list.id);
+    const isInList = newProjectIdsArray.includes(list.id);
+
+    if (wasInList && !isInList) {
+      list.tasksId.delete(taskId); // ← .delete()
+    }
+    if (!wasInList && isInList && !list.tasksId.has(taskId)) {
+      list.tasksId.add(taskId); // ← .add()
+    }
+  });
+  saveStateList(Lists);
+}
 /*----------------------------------All Task---------------------------------------*/
 const allTaskButton = document.getElementById('allTask');
 const main = document.querySelector('.main');
@@ -125,7 +207,15 @@ function drawCards(Taskes = Tasks, divTasks) {
         <p class="divTaskDesc">${task.desc}</p>
         <p class="divTaskdate">${task.date.slice(0, 10)}</p>
         <p class="divTaskPrior" style="color : ${ColorPriority(task.priority)}">${task.priority}</p>
-        <p class="divTaskProj">${task.project}</p>
+        <div class='divTaskProj'>
+        ${Array.from(task.projects).length === 0 ?
+        `<p class="divTaskProj">none projects</p>` :
+        Array.from(task.projects).map(proj => {
+          const list = Lists.find(el => el.id === proj);
+          return `<p class="divTaskProj">${list?.name || '???'}</p>`;
+        }).join('')
+      }
+        </div>
         <div class="TaskCardActions">
           <button class="divTaskEdit"></button>
           <button class="divTaskDel"></button>
@@ -170,9 +260,13 @@ function initTaskButtons(Taskes) {
       modalDesc.value = Taskes[index].desc;
       modalDate.value = Taskes[index].date;
       modalPrior.value = Taskes[index].priority;
-      modalProj.value = Taskes[index].project;
+      modalProj.innerHTML = Array.from(Taskes[index].projects).length === 0 ?
+        `<p class="divTaskProj">None projects</p>` :
+        Array.from(Taskes[index].projects).map(proj => {
+          const list = Lists.find(el => el.id === proj);
+          return `<p class="divTaskProj">${list?.name}</p>`;
+        }).join('');
       currentAction = ButtonsPar.id;
-      console.log(currentAction)
     })
   });
 
@@ -183,7 +277,14 @@ function initTaskButtons(Taskes) {
       let ButtonsPar = editsPar.parentElement;
       let curInTrueArr = parseInt(ButtonsPar.id);
       Tasks = Tasks.filter(item => item.id !== curInTrueArr);
-      saveState(Tasks);
+      saveStateTask(Tasks);
+      Lists.forEach(list => {
+        if (list.tasksId.has(curInTrueArr)) {
+          list.tasksId.delete(curInTrueArr);
+        }
+      });
+      saveStateList(Lists);
+      console.log(Lists)
       switch (where) {
         case 'Task': {
           showAllTasks();
@@ -219,7 +320,7 @@ function initCalendar() {
   calendarFlow.innerHTML = `
     <div class='calendarButtons'>
       <button class='prevWeek'>Previous week</button>
-      <p class='currentWeek'>12123</p>
+      <p class='currentWeek'></p>
       <button class='nextWeek'>Next week</button>
     </div>
     <div class='calendarTask'></div>
@@ -342,18 +443,19 @@ function placeTaskIntoSell(task, positionCell) {
   taskDivInCell.addEventListener('click', () => {
     dialogTask.showModal();
     curTask = Tasks.find(task => task.id == numberTask)
-    console.log(curTask)
     modalName.value = curTask.name;
     modalDesc.value = curTask.desc;
     modalDate.value = curTask.date;
     modalPrior.value = curTask.priority;
-    modalProj.value = curTask.project;
+    modalProj.innerHTML = curTask.projects.length == 0 ?
+      `<p class="divTaskProj">None projects</p> `
+      : curTask.projects.map(proj =>
+        `<p class="divTaskProj">${Lists.find(el => el.id == Number(proj)).name}</p> `
+      ).join('');
     currentAction = numberTask;
-    console.log(currentAction)
   })
 
 }
-
 /*----------------------------------Search---------------------------------------*/
 const SearchButton = document.getElementById('searchTask');
 
@@ -409,7 +511,182 @@ function searchTask(query) {
   }
 }
 
-initSearch();
+/*----------------------------------Lists---------------------------------------*/
 
-//листы загружать project в add из сущ проject
-  
+function List(name, tasksId = []) {
+  this.id = listCounter++;
+  this.name = name;
+  this.tasksId = new Set(tasksId.map(id => Number(id)));
+}
+
+
+const addListButton = document.querySelector('.addList');
+const dialogList = document.getElementById('createListWindow');
+const dialogListCancelButton = document.querySelector('.cancelList');
+
+const modalListName = document.getElementById('listName')
+const modaListTasks = document.getElementById('ListProjects')
+
+function openListDialog(listToEdit = null) {
+  const isEditing = listToEdit !== null;
+  const dialogTitle = dialogList.querySelector('h3') || document.createElement('h3');
+  if (!dialogList.querySelector('h3')) dialogList.prepend(dialogTitle);
+
+
+  dialogTitle.textContent = isEditing ? 'Edit list' : 'Create new list';
+  modalListName.value = isEditing ? listToEdit.name : '';
+
+  modaListTasks.innerHTML = Tasks.map(task => {
+    const isChecked = isEditing && listToEdit.tasksId.has(task.id);
+    return `
+      <label class="checkbox-label">
+        <input type="checkbox" name="projects" value="project${task.id}" ${isChecked ? 'checked' : ''} >
+        <span>${task.name}</span>
+      </label>
+    `}).join('');
+
+  dialogList.dataset.editingId = isEditing ? listToEdit.id : '';
+
+  dialogList.showModal();
+}
+
+addListButton.addEventListener('click', () => {
+  openListDialog();
+});
+
+dialogListCancelButton.addEventListener('click', () => {
+  dialogList.close();
+})
+
+dialogList.addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  const checked = document.querySelectorAll('input[name="projects"]:checked')
+  const checkedArr = Array.from(checked).map(div =>
+    Number(div.value.toString().slice(7))
+  );
+
+  const listName = modalListName.value.trim();
+  const isEditing = dialogList.dataset.editingId !== '';
+  let currentList;
+
+  if (isEditing) {
+    const listId = Number(dialogList.dataset.editingId);
+    currentList = Lists.find(l => l.id == listId);
+    if (!currentList) return;
+
+    const oldTasksId = new Set(currentList.tasksId);
+    currentList.name = listName;
+
+    currentList.tasksId.clear();
+    checkedArr.forEach(id => currentList.tasksId.add(id));
+
+    updateTaskProjectsOnListEdit(oldTasksId, checkedArr, currentList.id);
+    showList(currentList);
+
+  } else {
+    const newList = new List(listName, checkedArr.map(id => Number(id)));
+    Lists.push(newList);
+    currentList = newList;
+
+    checkedArr.forEach(taskId => {
+      const task = Tasks.find(t => t.id === taskId);
+      if (task && !task.projects.has(newList.id)) {
+        task.projects.add(newList.id);
+      }
+    });
+    showList(currentList);
+  }
+  saveStateList(Lists);
+  saveStateTask(Tasks);
+  dialogList.close();
+  insertListToleftPanel();
+  delete dialogList.dataset.editingId;
+})
+
+function updateTaskProjectsOnListEdit(oldTasksIdSet, newTasksIdArray, listId) {
+  Tasks.forEach(task => {
+    const wasInList = oldTasksIdSet.has(task.id);
+    const isInList = newTasksIdArray.includes(task.id);
+
+    if (wasInList && !isInList) {
+      task.projects.delete(listId);
+    }
+    if (!wasInList && isInList && !task.projects.has(listId)) {
+      task.projects.add(listId);
+    }
+  });
+}
+
+
+function insertListToleftPanel() {
+  const listOfLists = document.querySelector('.listsOfLists')
+  listOfLists.innerHTML = Lists.map(list => `<li>
+      <button class='listButton' id ='list${list.id}'>${list.name}</button>
+      <div class= 'listGroupByttons'>
+        <button class='divListEdit' id = 'divListEdit${list.id}'></button>
+        <button class='divListDel' id = 'divListDel${list.id}'></button>
+      </div>
+    </li>
+    `
+  ).join('')
+
+  Lists.forEach(list => {
+    let clickedList = document.getElementById(`list${list.id}`)
+    clickedList.addEventListener('click', () => {
+      showList(list);
+    })
+  })
+
+  Lists.forEach(list => {
+    let editButtonList = document.getElementById(`divListEdit${list.id}`)
+    editButtonList.addEventListener('click', () => {
+      openListDialog(list);
+    })
+  })
+
+  Lists.forEach(list => {
+    let delButtonList = document.getElementById(`divListDel${list.id}`)
+    delButtonList.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm(`Удалить список "${list.name}"?`)) {
+        deleteList(list.id);
+      }
+    })
+  })
+}
+
+function deleteList(listId) {
+  const listIdNum = Number(listId);
+
+  Tasks.forEach(task => {
+    task.projects.delete(listIdNum);
+  });
+
+  Lists = Lists.filter(list => list.id !== listIdNum);
+
+  saveStateList(Lists);
+  saveStateTask(Tasks);
+  insertListToleftPanel();
+  main.innerHTML = ''
+}
+
+function showList(List) {
+  let divList = document.createElement('div');
+  divList.classList.add('divList');
+  main.innerHTML = '';
+  main.appendChild(divList);
+  let ListTasks = Array.from(List.tasksId)
+    .map(id => Tasks.find(task => task.id === id))
+    .filter(Boolean);
+
+  divList.innerHTML = `
+  <h3>${List.name}</h3>
+  <div class='tasksInListDiv'>  
+  </div>
+  `
+
+  const tasksInListDiv = document.querySelector('.tasksInListDiv');
+  drawCards(ListTasks, tasksInListDiv)
+}
+
