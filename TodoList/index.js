@@ -12,61 +12,46 @@ function Task(name, desc, date, priority, projects) {
   this.desc = desc;
   this.date = date;
   this.priority = priority;
-  this.projects = new Set(projects.map(id => Number(id)));
+  this.projects = projects.map(id => Number(id));
 }
 
 function loadState() {
-  const savedTasks = localStorage.getItem('Tasks');
+  const savedState = localStorage.getItem('Tasks');
   const savedCounter = localStorage.getItem('taskIdCounter');
-
-  if (savedTasks) {
-    const parsed = JSON.parse(savedTasks);
-    Tasks = parsed.map(t => ({
-      ...t,
-      projects: new Set(Array.isArray(t.projects) ? t.projects : [])
-    }));
-  } else {
-    Tasks = [];
+  Tasks = savedState ? JSON.parse(savedState) : [];
+  if (Tasks.length > 0) {
+    const maxId = Math.max(...Tasks.map(t => t.id || 0));
+    taskIdCounter = maxId + 1;
+  } else if (savedCounter) {
+    taskIdCounter = parseInt(savedCounter);
   }
 
-  taskIdCounter = Tasks.length > 0
-    ? Math.max(...Tasks.map(t => t.id || 0)) + 1
-    : (savedCounter ? parseInt(savedCounter) : 0);
+  console.log(Tasks);
 
   const savedLists = localStorage.getItem('Lists');
-  if (savedLists) {
-    const parsed = JSON.parse(savedLists);
-    Lists = parsed.map(l => ({
-      ...l,
-      tasksId: new Set(Array.isArray(l.tasksId) ? l.tasksId : [])
-    }));
-  } else {
-    Lists = [];
+  const savedListCounter = localStorage.getItem('listCounter');
+  Lists = savedLists ? JSON.parse(savedLists) : [];
+  if (Lists.length > 0) {
+    const maxedId = Math.max(...Lists.map(l => l.id || 0));
+    listCounter = maxedId + 1;
+  } else if (savedListCounter) {
+    listCounter = parseInt(savedListCounter);
   }
 
-  listCounter = Lists.length > 0
-    ? Math.max(...Lists.map(l => l.id || 0)) + 1
-    : (localStorage.getItem('listCounter') ? parseInt(localStorage.getItem('listCounter')) : 0);
-
+  console.log(Lists);
   insertListToleftPanel();
 }
 
 function saveStateTask(Tasks) {
-  const tasksToSave = Tasks.map(task => ({
-    ...task,
-    projects: Array.from(task.projects)
-  }));
-  localStorage.setItem('Tasks', JSON.stringify(tasksToSave));
-  localStorage.setItem('taskIdCounter', taskIdCounter);
+  jsonTasks = JSON.stringify(Tasks);
+  localStorage.setItem('Tasks', jsonTasks);
+  localStorage.setItem('taskIdCounter', taskIdCounter)
 }
 
 function saveStateList(Lists) {
-  const listsToSave = Lists.map(list => ({
-    ...list,
-    tasksId: Array.from(list.tasksId)
-  }));
-  localStorage.setItem('Lists', JSON.stringify(listsToSave));
-  localStorage.setItem('listCounter', listCounter);
+  jsonLists = JSON.stringify(Lists);
+  localStorage.setItem('Lists', jsonLists);
+  localStorage.setItem('listCounter', listCounter)
 }
 
 loadState();
@@ -104,80 +89,60 @@ dialogTaskCancelButton.addEventListener('click', function () {
 })
 
 dialogTask.addEventListener('submit', function (event) {
+  let editableTask = Tasks.find(task => task.id == currentAction);
+
+  let checked = document.querySelectorAll('input[name="projects"]:checked')
+const checkedArr = Array.from(checked).map(input =>
+  Number(input.value.slice(7)) 
+);
+
+  let checkedPar = document.querySelectorAll('.checkbox-label')
+  checkedPar.innerHTML = '';
+
   event.preventDefault();
-
-  const checked = document.querySelectorAll('input[name="projects"]:checked');
-  const checkedArr = Array.from(checked).map(input => Number(input.value.slice(7)));
-
-  let newTask;
-
-  if (currentAction === -1) {
-    newTask = new Task(
-      modalName.value,
-      modalDesc.value,
-      modalDate.value,
-      modalPrior.value,
-      checkedArr
-    );
-    Tasks.push(newTask);
-
-    checkedArr.forEach(listId => {
-      const list = Lists.find(l => l.id === listId);
-      if (list && !list.tasksId.has(newTask.id)) {
-        list.tasksId.add(newTask.id);
-      }
-    });
-    saveStateList(Lists);
-
-  } else {
-    const editableTask = Tasks.find(t => t.id === currentAction);
-    if (!editableTask) return;
-
-
+  if (currentAction == -1) {
+    let curTasked = new Task(modalName.value, modalDesc.value, modalDate.value, modalPrior.value, checkedArr)
+    Tasks.push(curTasked);
+    let intcheckedArr = checkedArr.map(str => parseInt(str))
+    intcheckedArr.forEach(int => {
+      let foundList = Lists.find(list => list.id == int)
+      foundList.tasksId.push(`${curTasked.id}`)
+      saveStateList(Lists);
+    })
+  } else if (editableTask) {
     editableTask.name = modalName.value;
     editableTask.desc = modalDesc.value;
     editableTask.date = modalDate.value;
     editableTask.priority = modalPrior.value;
-    editableTask.projects = checkedArr;
-
-
-    const oldProjects = new Set(editableTask.projects);
-    editableTask.projects = new Set(checkedArr);
-
-    syncTaskWithLists(oldProjects, checkedArr, editableTask.id);
-    saveStateList(Lists);
   }
 
   saveStateTask(Tasks);
-  dialogTask.close();
 
   switch (where) {
-    case 'Task': showAllTasks(); break;
-    case 'Calendar': initCalendar(); break;
-    case 'Search':
-      initSearch();
-      const searchInput = document.querySelector('.taskSearch');
-      if (searchInput) searchInput.value = insertText;
-      searchTask(insertText);
+    case 'Task': {
+      showAllTasks();
       break;
-    default: showAllTasks();
+    }
+    case 'Calendar': {
+      initCalendar();
+      break;
+    }
+    case 'Search': {
+      initSearch();
+      const taskSearch = document.querySelector('.taskSearch')
+      taskSearch.value = insertText;
+      searchTask(insertText);
+    }
+    default: {
+      showAllTasks();
+      break;
+    }
   }
-});
 
-function syncTaskWithLists(oldProjectsSet, newProjectIdsArray, taskId) {
-  Lists.forEach(list => {
-    const wasInList = oldProjectsSet.has(list.id);
-    const isInList = newProjectIdsArray.includes(list.id);
+  dialogTask.close();
 
-    if (wasInList && !isInList) {
-      list.tasksId.delete(taskId); // ← .delete()
-    }
-    if (!wasInList && isInList && !list.tasksId.has(taskId)) {
-      list.tasksId.add(taskId); // ← .add()
-    }
-  });
-  saveStateList(Lists);
-}
+})
+
 /*----------------------------------All Task---------------------------------------*/
 const allTaskButton = document.getElementById('allTask');
 const main = document.querySelector('.main');
@@ -208,13 +173,11 @@ function drawCards(Taskes = Tasks, divTasks) {
         <p class="divTaskdate">${task.date.slice(0, 10)}</p>
         <p class="divTaskPrior" style="color : ${ColorPriority(task.priority)}">${task.priority}</p>
         <div class='divTaskProj'>
-        ${Array.from(task.projects).length === 0 ?
+        ${task.projects.length == 0 ?
         `<p class="divTaskProj">none projects</p>` :
-        Array.from(task.projects).map(proj => {
-          const list = Lists.find(el => el.id === proj);
-          return `<p class="divTaskProj">${list?.name || '???'}</p>`;
-        }).join('')
-      }
+        task.projects.map(proj => {
+          return `<p class="divTaskProj">${Lists.find(el => el.id == Number(proj)).name}</p> `
+        }).join('')}
         </div>
         <div class="TaskCardActions">
           <button class="divTaskEdit"></button>
@@ -260,12 +223,11 @@ function initTaskButtons(Taskes) {
       modalDesc.value = Taskes[index].desc;
       modalDate.value = Taskes[index].date;
       modalPrior.value = Taskes[index].priority;
-      modalProj.innerHTML = Array.from(Taskes[index].projects).length === 0 ?
-        `<p class="divTaskProj">None projects</p>` :
-        Array.from(Taskes[index].projects).map(proj => {
-          const list = Lists.find(el => el.id === proj);
-          return `<p class="divTaskProj">${list?.name}</p>`;
-        }).join('');
+      modalProj.innerHTML = Taskes[index].projects.length == 0 ?
+        `<p class="divTaskProj">None projects</p> `
+        : Taskes[index].projects.map(proj =>
+          `<p class="divTaskProj">${Lists.find(el => el.id == Number(proj)).name}</p> `
+        ).join('')
       currentAction = ButtonsPar.id;
     })
   });
@@ -278,11 +240,11 @@ function initTaskButtons(Taskes) {
       let curInTrueArr = parseInt(ButtonsPar.id);
       Tasks = Tasks.filter(item => item.id !== curInTrueArr);
       saveStateTask(Tasks);
-      Lists.forEach(list => {
-        if (list.tasksId.has(curInTrueArr)) {
-          list.tasksId.delete(curInTrueArr);
+      Lists.map(list => {
+        if (list.tasksId.includes(curInTrueArr.toString())) {
+          list.tasksId = list.tasksId.filter(item => item !== curInTrueArr.toString())
         }
-      });
+      })
       saveStateList(Lists);
       console.log(Lists)
       switch (where) {
@@ -516,7 +478,7 @@ function searchTask(query) {
 function List(name, tasksId = []) {
   this.id = listCounter++;
   this.name = name;
-  this.tasksId = new Set(tasksId.map(id => Number(id)));
+  this.tasksId = tasksId.map(id => Number(id));
 }
 
 
@@ -534,10 +496,11 @@ function openListDialog(listToEdit = null) {
 
 
   dialogTitle.textContent = isEditing ? 'Edit list' : 'Create new list';
+
   modalListName.value = isEditing ? listToEdit.name : '';
 
   modaListTasks.innerHTML = Tasks.map(task => {
-    const isChecked = isEditing && listToEdit.tasksId.has(task.id);
+    const isChecked = isEditing && listToEdit.tasksId.includes(task.id);
     return `
       <label class="checkbox-label">
         <input type="checkbox" name="projects" value="project${task.id}" ${isChecked ? 'checked' : ''} >
@@ -575,13 +538,11 @@ dialogList.addEventListener('submit', function (event) {
     currentList = Lists.find(l => l.id == listId);
     if (!currentList) return;
 
-    const oldTasksId = new Set(currentList.tasksId);
+    const oldTasksId = currentList.tasksId;
     currentList.name = listName;
+    currentList.tasksId = checkedArr.map(id => Number(id));
 
-    currentList.tasksId.clear();
-    checkedArr.forEach(id => currentList.tasksId.add(id));
-
-    updateTaskProjectsOnListEdit(oldTasksId, checkedArr, currentList.id);
+    updateTaskProjectsOnListEdit(oldTasksId, currentList.tasksId, currentList.id);
     showList(currentList);
 
   } else {
@@ -589,10 +550,11 @@ dialogList.addEventListener('submit', function (event) {
     Lists.push(newList);
     currentList = newList;
 
-    checkedArr.forEach(taskId => {
+    checkedArr.forEach(taskIdStr => {
+      const taskId = Number(taskIdStr);
       const task = Tasks.find(t => t.id === taskId);
-      if (task && !task.projects.has(newList.id)) {
-        task.projects.add(newList.id);
+      if (task && !task.projects.includes(newList.id)) {
+        task.projects.push(newList.id);
       }
     });
     showList(currentList);
@@ -604,16 +566,18 @@ dialogList.addEventListener('submit', function (event) {
   delete dialogList.dataset.editingId;
 })
 
-function updateTaskProjectsOnListEdit(oldTasksIdSet, newTasksIdArray, listId) {
+function updateTaskProjectsOnListEdit(oldTasksId, newTasksId, listId) {
+
   Tasks.forEach(task => {
-    const wasInList = oldTasksIdSet.has(task.id);
-    const isInList = newTasksIdArray.includes(task.id);
+    const wasInList = oldTasksId.includes(task.id);
+    const isInList = newTasksId.includes(task.id);
 
     if (wasInList && !isInList) {
-      task.projects.delete(listId);
+      task.projects = task.projects.filter(id => id !== listId);
     }
-    if (!wasInList && isInList && !task.projects.has(listId)) {
-      task.projects.add(listId);
+
+    if (!wasInList && isInList && !task.projects.includes(listId)) {
+      task.projects.push(listId);
     }
   });
 }
@@ -660,9 +624,8 @@ function deleteList(listId) {
   const listIdNum = Number(listId);
 
   Tasks.forEach(task => {
-    task.projects.delete(listIdNum);
+    task.projects = task.projects.filter(projId => projId !== listIdNum);
   });
-
   Lists = Lists.filter(list => list.id !== listIdNum);
 
   saveStateList(Lists);
@@ -676,9 +639,9 @@ function showList(List) {
   divList.classList.add('divList');
   main.innerHTML = '';
   main.appendChild(divList);
-  let ListTasks = Array.from(List.tasksId)
-    .map(id => Tasks.find(task => task.id === id))
-    .filter(Boolean);
+  let ListTasks = List.tasksId
+    .map(id => Tasks.find(task => task.id.toString() == id))
+    .filter(task => task !== undefined)
 
   divList.innerHTML = `
   <h3>${List.name}</h3>
@@ -690,3 +653,4 @@ function showList(List) {
   drawCards(ListTasks, tasksInListDiv)
 }
 
+//пофиксить раздвоение во второй раз
