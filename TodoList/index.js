@@ -77,7 +77,7 @@ createTask.addEventListener('click', function () {
   modalPrior.value = 'UnImportant';
   modalProj.innerHTML = Lists.map(list => `
   <label class="checkbox-label">
-    <input type="checkbox" name="projects" value="project${list.id}">
+    <input type="checkbox" name="projectsTasks" value="project${list.id}">
     <span>${list.name}</span>
   </label> `).join('');
   currentAction = -1;
@@ -91,13 +91,16 @@ dialogTaskCancelButton.addEventListener('click', function () {
 dialogTask.addEventListener('submit', function (event) {
   let editableTask = Tasks.find(task => task.id == currentAction);
 
-  let checked = document.querySelectorAll('input[name="projects"]:checked')
-const checkedArr = Array.from(checked).map(input =>
-  Number(input.value.slice(7)) 
-);
+  const checkedTasks = document.querySelectorAll('input[name="projectsTasks"]:checked')
+  const checkedArr = Array.from(checkedTasks).map(input =>
+    input.value.slice(7)
+  );
+  console.log(checkedArr)
 
   let checkedPar = document.querySelectorAll('.checkbox-label')
-  checkedPar.innerHTML = '';
+  checkedPar.forEach(element => {
+    element.innerHTML = '';
+  });
 
   event.preventDefault();
   if (currentAction == -1) {
@@ -503,7 +506,7 @@ function openListDialog(listToEdit = null) {
     const isChecked = isEditing && listToEdit.tasksId.includes(task.id);
     return `
       <label class="checkbox-label">
-        <input type="checkbox" name="projects" value="project${task.id}" ${isChecked ? 'checked' : ''} >
+        <input type="checkbox" name="projectsLists" value="project${task.id}" ${isChecked ? 'checked' : ''} >
         <span>${task.name}</span>
       </label>
     `}).join('');
@@ -524,10 +527,11 @@ dialogListCancelButton.addEventListener('click', () => {
 dialogList.addEventListener('submit', function (event) {
   event.preventDefault();
 
-  const checked = document.querySelectorAll('input[name="projects"]:checked')
-  const checkedArr = Array.from(checked).map(div =>
+  const checked = document.querySelectorAll('input[name="projectsLists"]:checked')
+  const checkedArrList = Array.from(checked).map(div =>
     Number(div.value.toString().slice(7))
   );
+
 
   const listName = modalListName.value.trim();
   const isEditing = dialogList.dataset.editingId !== '';
@@ -540,17 +544,17 @@ dialogList.addEventListener('submit', function (event) {
 
     const oldTasksId = currentList.tasksId;
     currentList.name = listName;
-    currentList.tasksId = checkedArr.map(id => Number(id));
+    currentList.tasksId = checkedArrList.map(id => Number(id));
 
     updateTaskProjectsOnListEdit(oldTasksId, currentList.tasksId, currentList.id);
     showList(currentList);
 
   } else {
-    const newList = new List(listName, checkedArr.map(id => Number(id)));
+    const newList = new List(listName, checkedArrList.map(id => Number(id)));
     Lists.push(newList);
     currentList = newList;
 
-    checkedArr.forEach(taskIdStr => {
+    checkedArrList.forEach(taskIdStr => {
       const taskId = Number(taskIdStr);
       const task = Tasks.find(t => t.id === taskId);
       if (task && !task.projects.includes(newList.id)) {
@@ -653,4 +657,4 @@ function showList(List) {
   drawCards(ListTasks, tasksInListDiv)
 }
 
-//пофиксить раздвоение во второй раз
+//пофиксить авто добавление при создании таски
