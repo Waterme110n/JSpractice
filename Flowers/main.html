@@ -1,37 +1,33 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>for mom</title>
   <style>
-    * {
-      --main-color: ;
-      --secondary-color: ;
-      --third-color: ;
-    }
-
-    html::-webkit-scrollbar {
-      display: none;
-    }
-
     body {
-      overflow-x: hidden;
       margin: 0;
-      padding: 300px;
-      display: flex;
-      flex-direction: row;
-      text-align: center;
-      justify-content: space-between;
-      align-items: end;
-      background-color: var(--main-color);
+      overflow: hidden;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
     }
   </style>
 </head>
 
-<body class="body">
-  <script src="index.js"></script>
+<body>
+  <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "orbitcontrols": "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js",
+          "gltfloader": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"
+        }
+      }
+    </script>
+  <script type="module" src="index.js"></script>
+
 </body>
 
 </html>

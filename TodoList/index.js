@@ -656,5 +656,3 @@ function showList(List) {
   const tasksInListDiv = document.querySelector('.tasksInListDiv');
   drawCards(ListTasks, tasksInListDiv)
 }
-
-//пофиксить авто добавление при создании таски
